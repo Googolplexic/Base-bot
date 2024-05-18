@@ -20,9 +20,6 @@ load_dotenv()
 prefix = "!"
 
 
-# @client.command(pass_context=True)
-# async def getguild(ctx):
-#     guild_id = ctx.message.guild.id
 
 @client.event
 async def on_ready():
