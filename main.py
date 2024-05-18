@@ -18,7 +18,16 @@ tree = discord.app_commands.CommandTree(client)
 load_dotenv()
 
 prefix = "!"
-
+def get_summoner_data(summoner_name):
+    url = RIOT_API_URL.replace('REGION', 'YOUR_REGION') + summoner_name
+    headers = {
+        'X-Riot-Token': RIOT_API_KEY
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
 
 # @client.command(pass_context=True)
 # async def getguild(ctx):
@@ -45,12 +54,30 @@ async def on_ready():
 async def first_command(interaction):
     await interaction.response.send_message("Hello!")
 @tree.command(
-    name="cheese",
+    name="cheeseInput",
     description="My first application Command",
     guild=discord.Object(id=1241468028378677308)
 )
 async def not_first_command(interaction):
     await interaction.response.send_message("cheese!")
+@tree.command(
+    name = "getSummoner"
+    description="get summoner data"
+    guild=discord.Object(id=1241468028378677308)
+    )
+async def summoner(ctx, *, summoner_name):
+    data = get_summoner_data(summoner_name)
+    if data:
+        await ctx.send(f"Summoner Name: {data['name']}\nSummoner Level: {data['summonerLevel']}")
+    else:
+        await ctx.send("Summoner not found or API error.")
+
+
+
+
+
+
+
 @client.event
 async def on_message(message):
     if message.author == client.user:

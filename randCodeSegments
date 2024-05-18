@@ -28,7 +28,7 @@ async def summoner(ctx, *, summoner_name):
 
 
 
-// EXAMPLE:
+## EXAMPLE:
 import discord
 from discord.ext import commands
 import requests
@@ -68,7 +68,7 @@ bot.run(DISCORD_BOT_TOKEN)
 
 
 
-// Match Fetch
+## Match Fetch
 def get_match_history(encrypted_account_id):
     url = f'https://<region>.api.riotgames.com/lol/match/v4/matchlists/by-account/{encrypted_account_id}'
     headers = {
@@ -95,7 +95,7 @@ async def matches(ctx, *, summoner_name):
 
 
 
-// Match
+## Match
 
 MATCH_HISTORY_API_URL = 'https://<region>.api.riotgames.com/lol/match/v4/matchlists/by-account/'
 
@@ -111,7 +111,7 @@ def get_match_history(account_id, region):
         return None
 
 
-// COMPLETE EXAMPLE
+## COMPLETE EXAMPLE
 
 import discord
 from discord.ext import commands
