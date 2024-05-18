@@ -57,6 +57,7 @@ async def first_command(interaction):
 )
 async def not_first_command(interaction):
     await interaction.response.send_message("cheese!")
+    
 @tree.command(
     name = "getSummoner"
     description="get summoner data"
@@ -68,9 +69,6 @@ async def summoner(ctx, *, summoner_name):
         await ctx.send(f"Summoner Name: {data['name']}\nSummoner Level: {data['summonerLevel']}")
     else:
         await ctx.send("Summoner not found or API error.")
-
-
-
 
 
 
