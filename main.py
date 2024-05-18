@@ -44,7 +44,13 @@ async def on_ready():
 )
 async def first_command(interaction):
     await interaction.response.send_message("Hello!")
-
+@tree.command(
+    name="cheese",
+    description="My first application Command",
+    guild=discord.Object(id=1241468028378677308)
+)
+async def not_first_command(interaction):
+    await interaction.response.send_message("cheese!")
 @client.event
 async def on_message(message):
     if message.author == client.user:
