@@ -48,6 +48,21 @@ async def first_command(interaction):
 )
 async def not_first_command(interaction):
     await interaction.response.send_message("cheese!")
+
+@tree.command(
+    name="input-userid-api-id",
+    description="direct messages the user and grabs a valid input",
+    guild=discord.Object(id=1241468028378677308)
+)
+async def user_input_id_api_key(interaction):
+    await interaction.response.send_message("{} is your id".format(interaction.message.author.id))
+
+    user = await client.get_user_info("User's ID here")
+    await interaction.response.send_message(user, "Your message goes here")
+
+
+
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
