@@ -29,9 +29,6 @@ def get_summoner_data(summoner_name):
     else:
         return None
 
-# @client.command(pass_context=True)
-# async def getguild(ctx):
-#     guild_id = ctx.message.guild.id
 
 @client.event
 async def on_ready():
