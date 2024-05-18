@@ -2,7 +2,7 @@
 # https://discordpy.readthedocs.io/en/stable/quickstart.html#a-minimal-bot
 
 import os
-
+from dotenv import load_dotenv
 import discord
 
 intents = discord.Intents.default()
@@ -10,7 +10,7 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
-
+load_dotenv()
 
 @client.event
 async def on_ready():
@@ -27,10 +27,9 @@ async def on_message(message):
 
 
 try:
-#   token = os.getenv("TOKEN") or ""
-#   if token == "":
-#     raise Exception("Please add your token to the Secrets pane.")
-    token = "MTI0MTQ2NjI0MTk3ODQ2NjM2NA.GGom4I.Ct07LrBpqfn7ilOPxbIIgmorebLgqhAQqCxgxo"
+    token = os.getenv("TOKEN") or ""
+    if token == "":
+        raise Exception("The Token doesn't exist")
     client.run(token)
 except discord.HTTPException as e:
     if e.status == 429:
