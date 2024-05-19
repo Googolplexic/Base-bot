@@ -14,8 +14,6 @@ class Player():
 
 
     def get_puuid(self):
-        lol_watcher = LolWatcher(self.API_KEY)
-
         riot_watcher = RiotWatcher(self.API_KEY)
 
         my_account = riot_watcher.account.by_riot_id(self.region, self.game_name, self.tag_line)
@@ -45,7 +43,14 @@ class Player():
             return True
         else:
             return False
+    def won_game(self, game):
+        for i in range(10):
+            if (game['info']['participants'][i]['puuid'] == self.puuid):
+                return game['info']['participants'][i]['win']
 
+            
+
+    
 
 # print("start")
 william = Player(API_KEY, "choopedpotat", "Bruhy")
@@ -55,10 +60,11 @@ print(william.get_puuid())
 
 mlist = william.get_matchlist()
 print(mlist)
-game = william.match_data(mlist[1])
-print(game)
-for i in range(10):
-    print(game['info']['participants'][i]['puuid'])
+for i in range(6):
+    game = william.match_data(mlist[i])
+    # print(game)
+
+    print(william.won_game(game))
 
 # print()
 
