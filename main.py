@@ -139,7 +139,8 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         #do this
         print('YAH')
         embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
-        embed.add_field(name=((f"{user.name}\'s KDA").ljust(50)  +  (f"{user2.name}\'s KDA").rjust(50)),value= ((f"{user.name}\'s kda data here").ljust(50) +    (f"{user2.name}\'s kda data here").rjust(50)),inline=True)
+        embed.add_field(name=(f"{user.name}\'s KDA").ljust(50),value= (f"{user.name}\'s kda data here").ljust(50), inline=True)
+        embed.add_field(name=(f"{user2.name}\'s KDA").rjust(50),value= (f"{user2.name}\'s kda data here").rjust(50),inline=True)
 
         print(str(user))
         P1 = Player(db.get(str(user) + "apikey"),db.get(str(user)+"gamename"), db.get(str(user)+"tagline"))
