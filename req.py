@@ -30,3 +30,12 @@ def get_match(key, puuid):
 
 ee = get_match(API_KEY, puuid)
 print(ee)
+
+
+def match_info(key, matchID):
+    lol_watcher = LolWatcher(key, puuid=puuid, count=20)
+    ea = lol_watcher.match.by_id('AMERICAS', matchID);
+    return ea
+
+matchinf = match_info(API_KEY, ee[2])
+print(matchinf)
