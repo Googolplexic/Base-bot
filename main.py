@@ -107,6 +107,8 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
     elif view.value:
         #do this
         print('YAH')
+        print(str(user))
+        P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
         embed = nextcord.Embed(color= 0xB9F5F1, title='LETSS GO')
         embed.add_field(name='iewruhfweiuhf',value= 'ewiufhewifhu',inline=False)
         
