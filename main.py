@@ -48,16 +48,31 @@ async def on_ready():
 
 @bot.slash_command(
     name = "addtodb",
-    description = "adduid",
+    description = "Enter API Key, Game name, and Tagline (no hashtag)",
     guild_ids= GUILD_ID
 )
-async def test(ctx: nextcord.Interaction, uid: str) -> None:
+async def addtodb(ctx: nextcord.Interaction, api: str, gamename: str, tagline: str) -> None:
     author = str(ctx.user) # We get the username (RobertK#6151)
+    toPrint = ""
     if not db.exists(author+"apikey"): # If username is not already in the database
-        db.set(author + "apikey", uid)
-        await ctx.response.send_message(f'API key "{uid}" associated with "{ctx.user}" is now registered', ephemeral = True) # Make profile for username in database or it will error
+        db.set(author + "apikey", api)
+        toPrint +=(f'API key "{api}" associated with "{ctx.user}" is now registered\n') # Make profile for username in database or it will error
     else: 
-        await ctx.response.send_message(f'"{uid}" already registered with user "{ctx.user}"', ephemeral = True)
+        toPrint +=(f'"{api}" already registered with user "{ctx.user}"\n')
+
+
+    if not db.exists(author+"gamename"): # If username is not already in the database
+        db.set(author + "gamename", gamename)
+        toPrint +=(f'Game name "{gamename}" associated with "{ctx.user}" is now registered\n') # Make profile for username in database or it will error
+    else: 
+        toPrint+=(f'"{gamename}" already registered with user "{ctx.user}"\n')
+        
+    if not db.exists(author+"tagline"): # If username is not already in the database
+        db.set(author + "tagline", tagline)
+        toPrint+=(f'Tagline "{tagline}" associated with "{ctx.user}" is now registered\n') # Make profile for username in database or it will error
+    else: 
+        toPrint+=(f'"{tagline}" already registered with user "{ctx.user}"\n')
+    await ctx.response.send_message(f'{toPrint}', ephemeral = True)
 
 # ==============Isithas shit code begins
 
@@ -66,7 +81,7 @@ async def test(ctx: nextcord.Interaction, uid: str) -> None:
     description = "Display Currency",
     guild_ids= GUILD_ID
 )
-async def test(ctx: nextcord.Interaction) -> None:
+async def dispcurrency(ctx: nextcord.Interaction) -> None:
     author = str(ctx.user) # We get the username (RobertK#6151)
     if not db.exists(author+"currency"): # If username is not already in the database
         await ctx.response.send_message(f'Unable to get currency associated with "{ctx.user}"', ephemeral = True) # Make profile for username in database or it will error
@@ -124,7 +139,7 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         #do this
         print('YAH')
         print(str(user))
-        #P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
+        P1 = Player(db.get(str(user) + "apikey"),db.get(str(user)+"gamename"), db.get(str(user)+"tagline"))
         embed = nextcord.Embed(color= 0xB9F5F1, title='LETSS GO')
         embed.add_field(name='iewruhfweiuhf',value= 'ewiufhewifhu',inline=False)
         
