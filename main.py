@@ -145,7 +145,7 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         P1 = Player(db.get(str(user) + "apikey"),db.get(str(user)+"gamename"), db.get(str(user)+"tagline"))
         
         await interaction.edit_original_message(content=None, embed=embed)
-    #awidjaijdiawjd
+    #i changed a comment
 
 
     else:
