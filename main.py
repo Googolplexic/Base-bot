@@ -203,11 +203,17 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
 
     def check_match_length(matchList):
             prevMatchCount = len(matchList)
+    async def check_match_length(matchList):
+        prevMatchCount = len(matchList)
 
             for _ in range(3):  # Loop 3 times 
                 start_time = time.time()
                 time.sleep(3)  # Sleep for 1800 seconds (30 minutes)
                 end_time = time.time()
+        for _ in range(3):  # Loop 3 times 
+            start_time = time.time()
+            await asyncio.sleep(5)  # Non-blocking sleep for 5 seconds
+            end_time = time.time()
 
                 if len(matchList) == prevMatchCount + 1:
                     return 1
@@ -226,6 +232,11 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
 
     #when the duel is won by one party or the other
     
+    async def main():
+        P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
+        mlist = await P1.get_matchlist()
+        result = await check_match_length(mlist)
+        print(result)
 
 
 
