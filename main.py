@@ -127,6 +127,10 @@ class buttonMenu(nextcord.ui.View):
         self.value = True
         self.stop()
 
+
+
+#assume bet is here
+
 print("cheese!")
 # Add the guild ids in which the slash command will appear.
 # If it should be in all, remove the argument, but note that
@@ -178,7 +182,7 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
 
             for _ in range(3):  # Loop 3 times 
                 start_time = time.time()
-                time.sleep(3)  # Sleep for 1800 seconds (30 minutes)
+                time.sleep(1800)  # Sleep for 1800 seconds (30 minutes)
                 end_time = time.time()
 
                 if len(matchList) == prevMatchCount + 1:
@@ -192,7 +196,9 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
 
         
     P1 = Player(db.get(str(user) + "apikey")    ,"choopedpotat", "Bruhy")
+    P2 = Player(db.get(str(user2) + "apikey")    ,"Wurrd", "0000")
     mlist = P1.get_matchlist()
+    mlist2 = P2.get_matchlist()
     if check_match_length(mlist) == 0:
         await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
 
