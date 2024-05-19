@@ -12,6 +12,8 @@ import nextcord.ext
 from nextcord import Intents
 from nextcord import Client
 from nextcord import application_command
+import pickledb
+db = pickledb.load('discord.db', True)
 
 GUILD_ID = [1241468028378677308]
 
@@ -42,8 +44,19 @@ async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
     print("Ready!")
 
-
-
+@bot.slash_command(
+    name = "addtodb",
+    description = "adduid",
+    guild_ids= GUILD_ID
+)
+async def test(ctx: nextcord.Interaction, uid: str) -> None:
+    author = str(ctx.user) # We get the username (RobertK#6151)
+    if not db.exists(author+"apikey"): # If username is not already in the database
+        db.set(author + "apikey", uid)
+        await ctx.response.send_message(f'API key "{uid}" associated with "{ctx.user}" is now registered', ephemeral = True) # Make profile for username in database or it will error
+    else: 
+        await ctx.response.send_message(f'"{uid}" already registered with user "{ctx.user}"', ephemeral = True)
+    
 print("hi)")
 # Add the guild ids in which the slash command will appear.
 # If it should be in all, remove the argument, but note that
@@ -52,7 +65,6 @@ print("hi)")
 @bot.slash_command(
     name="duel",
     description="Enter an opponent's discord username to send them a duel invitation",
-    guild_ids= GUILD_ID
 )
 async def duel(interaction: nextcord.Interaction, message: str) -> None:
     await interaction.response.send_message("Awaiting Opponent Response")
