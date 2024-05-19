@@ -12,6 +12,7 @@ class Player():
 
     def get_puuid(self):
         riot_watcher = RiotWatcher(self.API_KEY)
+        print("aaaaa    ", riot_watcher)
 
         my_account = riot_watcher.account.by_riot_id(self.region, self.game_name, self.tag_line)
         #my_account = riot_watcher.account.by_riot_id('AMERICAS', 'choopedpotat', 'Bruhy')
