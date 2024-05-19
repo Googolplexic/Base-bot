@@ -16,7 +16,7 @@ from nextcord import Intents
 from nextcord import Client
 from nextcord.ext import application_checks
 import pickledb
-from req import Player, in_same_game
+from apiRiot import Player, in_same_game
 tracemalloc.start()
 db = pickledb.load('discord.db', True)
 db.set("Player 1", "")
@@ -90,6 +90,7 @@ async def dispcurrency(ctx: nextcord.Interaction) -> None:
 )
 async def cancel(ctx: nextcord.Interaction) -> None:
     global inprogress
+    global better_list
     if inprogress == 0:
         await ctx.response.send_message('No match in progress', ephemeral = True) 
     else: 
@@ -124,11 +125,10 @@ async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int, bet_to_wi
     global inprogress
     global better_list
    
-    if usr.id not in better_list:
-        better_list.append(usr.id)
+    if ctx.user.id in better_list:
         await ctx.response.send_message(f'Invalid bet: You have already made a bet', ephemeral = True)
     else:
-
+        better_list.append(ctx.user.id)
         if inprogress == 0:
             await ctx.response.send_message(f'Invalid bet: No match in progress', ephemeral = True)
         elif not db.exists(author+"currency"):
@@ -175,8 +175,38 @@ class singleButton(nextcord.ui.View):
         self.value = None
     
     @nextcord.ui.button(label = 'Match Over', style=nextcord.ButtonStyle.blurple)
-    async def confirm(self, button:nextcord.ui.Button, interaction:nextcord.Interaction):
-        await interaction.response.send_message('blurp is press', ephemeral=False)
+    async def matchover(self, button:nextcord.ui.Button, interaction:nextcord.Interaction):
+        await interaction.response.send_message('Match is now over: see updated embed for results', ephemeral=False)
+        self.value = True
+        self.stop()
+    @nextcord.ui.button(label = 'Cancel', style=nextcord.ButtonStyle.red)
+    async def cancel2(self, button:nextcord.ui.Button, ctx:nextcord.Interaction):
+        global inprogress
+        global better_list
+        if inprogress == 0:
+            await ctx.response.send_message('No match in progress', ephemeral = True) 
+        else: 
+            inprogress == 0
+            better_list = []
+            await ctx.response.send_message('Match in progress cancelled') 
+        self.value = False
+        self.stop()
+
+class canButton(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.value = None
+    
+    @nextcord.ui.button(label = 'Cancel', style=nextcord.ButtonStyle.red)
+    async def cancel(self, button:nextcord.ui.Button, ctx:nextcord.Interaction):
+        global inprogress
+        global better_list
+        if inprogress == 0:
+            await ctx.response.send_message('No match in progress', ephemeral = True) 
+        else: 
+            inprogress == 0
+            better_list = []
+            await ctx.response.send_message('Match in progress cancelled') 
         self.value = True
         self.stop()
 
@@ -215,7 +245,7 @@ async def chooseWinner(interaction: nextcord.Interaction, winner: nextcord.User)
         else:
             await interaction.response.send_message("Inputted winner was not in the match")
     else: 
-        await interaction.response.send_message("No match in progress")
+        await interaction.response.send_message("No match in progress/Match was cancelled")
 
 @bot.slash_command(
     name="duel",
@@ -224,10 +254,11 @@ async def chooseWinner(interaction: nextcord.Interaction, winner: nextcord.User)
 )
 async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> None:
     global inprogress
-    duel_over = False
+    global better_list
     if inprogress == 1:
         await interaction.response.send_message("Match already in progress. Please wait for it to end.")
     else:
+        better_list = []
         await interaction.response.send_message("Awaiting Opponent Response")
         user = await bot.fetch_user(interaction.user.id)
         db.set("Player 1",str(user))
@@ -237,6 +268,7 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         print(user2)
         
         view = buttonMenu()
+        can = canButton()
 
         await user2.send("accept or deny the duel lol", view=view)
         await view.wait()
@@ -254,23 +286,11 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
             print(db.get(str(user) + "apikey"))
             P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
             
-            await interaction.edit_original_message(content=None, embed=embed)
-
-async def check_match_length(matchList):
-            prevMatchCount = len(matchList)
-            for _ in range(3): 
-                start_time = time.time()
-                await asyncio.sleep(5)  
-                end_time = time.time()
-                print(len(matchList))
-                print(prevMatchCount +1)
-                if len(matchList) == prevMatchCount + 1:
-                    print("returning 1")
-                    return 1
-                else:
-                    prevMatchCount = len(matchList) 
-                    print("Match Invalid: Length Too Long")
-                    return 0  
+            await interaction.edit_original_message(content=None, embed=embed, view = can)
+            await can.wait()
+            if can.value == True:
+                inprogress = 0
+                better_list= []
 
 
         
@@ -324,14 +344,14 @@ async def check_match_length(matchList):
     description="Enter your discord username to start a match",
     guild_ids = GUILD_ID
 )
-async def singles(interaction: nextcord.Interaction, protagonist: nextcord.User) -> None:
+async def singles(interaction: nextcord.Interaction) -> None:
     global inprogress
     global better_list
-    duel_over = False
     if inprogress == 1:
         await interaction.response.send_message("Match already in progress. Please wait for it to end.")
     else:
-        await interaction.response.send_message("Awaiting Opponent Response")
+        better_list = []
+        await interaction.response.send_message("Singles betting started")
         user = await bot.fetch_user(interaction.user.id)
         db.set("Player 1",str(user))
         db.set("Player 2",str(user))
@@ -353,9 +373,12 @@ async def singles(interaction: nextcord.Interaction, protagonist: nextcord.User)
         await interaction.edit_original_message(content=None, embed=embed, view = veew)
         await veew.wait()
 
-        if veew.value is None:
+        if inprogress==0 or veew.value == False:
+            interaction.edit_original_message(content="MATCH CANCELLED", embed=embed)
+            inprogress = 0
+            better_list= []
             return
-        elif veew.value:
+        else:
             match = P1.get_most_recent_match()
                 #add function for checking who won
             for i in better_list:
@@ -377,7 +400,7 @@ async def singles(interaction: nextcord.Interaction, protagonist: nextcord.User)
             better_list= []
             inprogress = 0
         
-            winbed = nextcord.Embed(color= 0x6DDE62, title='DUEL RESULTS: ' +str(user))
+            winbed = nextcord.Embed(color= 0x6DDE62, title='SINGLE MATCH RESULTS: ' +str(user))
             if P1.won_game(match):
                 winbed.add_field(name ="WIN".center(50), value=f"CHAMPION: :sparkles: {user} :sparkles:".center(50))
             else:
