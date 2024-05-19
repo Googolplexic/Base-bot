@@ -1,7 +1,7 @@
 from riotwatcher import LolWatcher, RiotWatcher, ApiError
 
 
-API_KEY = "RGAPI-b8b31eaa-e4f0-471c-8932-714a8e7d0c92"
+API_KEY = "RGAPI-b6af20cb-4e3a-4afa-acb2-571f3a71ac03"
 #API_KEY = "RGAPI-93300605-bf88-4d55-ad19-5055c0710c3e"
 
 
@@ -11,8 +11,8 @@ def get_puuid(key):
 
     riot_watcher = RiotWatcher(key)
 
-    my_account = riot_watcher.account.by_riot_id('AMERICAS', 'choopedpotat', 'Bruhp')
-    # my_account = riot_watcher.account.by_riot_id('AMERICAS', 'ahtisi', 'cmpt')
+    my_account = riot_watcher.account.by_riot_id('AMERICAS', 'choopedpotat', 'Bruhy')
+    #my_account = riot_watcher.account.by_riot_id('AMERICAS', 'ahtisi', 'cmpt')
 
     return (my_account['puuid'])
 
