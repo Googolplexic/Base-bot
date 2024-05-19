@@ -144,32 +144,35 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         embed.add_field(name=(f"{user2.name}\'s KDA").rjust(50),value= (f"{user2.name}\'s kda data here").rjust(50),inline=True)
 
         print(str(user))
-        P1 = Player(db.get(str(user) + "apikey"),db.get(str(user)+"gamename"), db.get(str(user)+"tagline"))
+        print(db.get(str(user) + "apikey"))
+        P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
         
         await interaction.edit_original_message(content=None, embed=embed)
     #i changed a comment
-    
+
 
     def check_match_length(matchList):
-        prevMatchCount = len(matchList)
+            prevMatchCount = len(matchList)
 
-        for _ in range(3):  # Loop 3 times 
-            start_time = time.time()
-            time.sleep(5)  # Sleep for 1800 seconds (30 minutes)
-            end_time = time.time()
+            for _ in range(3):  # Loop 3 times 
+                start_time = time.time()
+                time.sleep(3)  # Sleep for 1800 seconds (30 minutes)
+                end_time = time.time()
 
-            if len(matchList) == prevMatchCount + 1:
-                return 1
-            else:
-                prevMatchCount = len(matchList)  # Update the previous match count
+                if len(matchList) == prevMatchCount + 1:
+                    return 1
+                else:
+                    prevMatchCount = len(matchList)  # Update the previous match count
 
-        print("Match Invalid: Length Too Long")
-        return 0  # Assuming a return value of 0 to indicate invalid match
+            print("Match Invalid: Length Too Long")
+
+            return 0  # Assuming a return value of 0 to indicate invalid match
 
         
-    P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
-    mlist = P1.get_matchlist
-    check_match_length(mlist)
+    P1 = Player(db.get(str(user) + "apikey")    ,"choopedpotat", "Bruhy")
+    mlist = P1.get_matchlist()
+    if check_match_length(mlist) == 0:
+        await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
 
 
 
