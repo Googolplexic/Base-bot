@@ -12,7 +12,7 @@ from nextcord.ext import commands
 import nextcord.ext
 from nextcord import Intents
 from nextcord import Client
-from nextcord import application_command
+from nextcord.ext import application_checks
 import pickledb
 from req import Player
 
@@ -90,6 +90,22 @@ async def dispcurrency(ctx: nextcord.Interaction) -> None:
         curr = db.get(author + "currency")
         await ctx.response.send_message(f'"{ctx.user}" has ${curr} in the bank', ephemeral = True)
     
+
+@bot.slash_command(
+    name = "addcurrency",
+    description = "Adds Currency if admin",
+    guild_ids= GUILD_ID
+)
+@application_checks.has_permissions(manage_messages=True)
+async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
+    author = str(usr) # We get the username (RobertK#6151)
+    if not db.exists(author+"currency"): # If username is not already in the database
+        db.set(author+"currency", add)
+        await ctx.response.send_message(f'No currency count associated "{usr}", adding an entry of ${add}', ephemeral = True) # Make profile for username in database or it will error
+    else: 
+        db.set(author+"currency", db.get(author+"currency")+add)
+        curr = db.get(author + "currency")
+        await ctx.response.send_message(f'"{usr}" now has ${curr} in the bank', ephemeral = True)
 # ==============Isitha's shit code ends    
 
 class buttonMenu(nextcord.ui.View):
