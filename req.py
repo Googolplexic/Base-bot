@@ -4,38 +4,57 @@ import json
 API_KEY = "RGAPI-b6af20cb-4e3a-4afa-acb2-571f3a71ac03"
 #API_KEY = "RGAPI-93300605-bf88-4d55-ad19-5055c0710c3e"
 
-
-def get_puuid(key):
-
-    lol_watcher = LolWatcher(key)
-
-    riot_watcher = RiotWatcher(key)
-
-    my_account = riot_watcher.account.by_riot_id('AMERICAS', 'choopedpotat', 'Bruhy')
-    #my_account = riot_watcher.account.by_riot_id('AMERICAS', 'ahtisi', 'cmpt')
-
-    return (my_account['puuid'])
-
-puuid = get_puuid(API_KEY)
-print(puuid)
-
-def get_match(key, puuid):
-        
-    lol_watcher = LolWatcher(key, puuid=puuid, count=20)
-
-    my_region = 'na1'
-    aa = lol_watcher.match.matchlist_by_puuid(my_region, puuid=puuid)
-    return aa
+class Player():
+    def __init__(self, API_KEY , game_name, tag_line, region="AMERICAS"):
+        self.API_KEY = API_KEY
+        self.game_name = game_name
+        self.tag_line = tag_line
+        self.region = region
+        self.puuid = self.get_puuid()
 
 
-ee = get_match(API_KEY, puuid)
-print(ee)
+    def get_puuid(self):
+        lol_watcher = LolWatcher(self.API_KEY)
+
+        riot_watcher = RiotWatcher(self.API_KEY)
+
+        my_account = riot_watcher.account.by_riot_id(self.region, self.game_name, self.tag_line)
+        #my_account = riot_watcher.account.by_riot_id('AMERICAS', 'choopedpotat', 'Bruhy')
+        #my_account = riot_watcher.account.by_riot_id('AMERICAS', 'ahtisi', 'cmpt')
+
+        return (my_account['puuid'])
 
 
-def match_info(key, matchID):
-    lol_watcher = LolWatcher(key, puuid=puuid, count=20)
-    ea = lol_watcher.match.by_id('AMERICAS', matchID);
-    return ea
+    def get_matchlist(self):
+        lol_watcher = LolWatcher(self.API_KEY, puuid=self.puuid, count=20)
+        matchList = lol_watcher.match.matchlist_by_puuid(self.region, puuid=self.puuid)
+        return matchList
 
-Match = match_info(API_KEY, ee[2])
-print(Match['metadata']['participants'])
+    def match_data(self, matchID):
+        lol_watcher = LolWatcher(self.API_KEY, puuid=self.puuid, count=20)
+        matchData = lol_watcher.match.by_id(self.region, matchID);
+        return matchData
+
+
+print("start")
+william = Player(API_KEY, "choopedpotat", "Bruhy")
+print("done")
+print(william.get_puuid())
+
+mlist = william.get_matchlist()
+print(mlist)
+game = william.match_data(mlist[1])
+print(game)
+for i in range(10):
+    print(game['info']['participants'][i]['win'])
+
+# print()
+
+# puuid = get_puuid(API_KEY)
+# print(puuid)
+
+# ee = get_match(API_KEY, puuid)
+# print(ee)
+
+# Match = match_info(API_KEY, ee[2])
+# print(Match['metadata']['participants'])
