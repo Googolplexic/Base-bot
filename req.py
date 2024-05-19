@@ -1,5 +1,5 @@
 from riotwatcher import LolWatcher, RiotWatcher, ApiError
-from time import sleep
+#from time import sleep
 
 class Player():
     def __init__(self, API_KEY , game_name, tag_line, region="AMERICAS"):
@@ -9,16 +9,12 @@ class Player():
         self.region = region
         self.puuid = self.get_puuid()
 
-
     def get_puuid(self) -> str:
         riot_watcher = RiotWatcher(self.API_KEY)
         
         my_account = riot_watcher.account.by_riot_id(self.region, self.game_name, self.tag_line)
-        #my_account = riot_watcher.account.by_riot_id('AMERICAS', 'choopedpotat', 'Bruhy')
-        #my_account = riot_watcher.account.by_riot_id('AMERICAS', 'ahtisi', 'cmpt')
 
         return (my_account['puuid'])
-
 
     def get_matchlist(self) -> list:
         riot_watcher = RiotWatcher(self.API_KEY)
@@ -43,10 +39,12 @@ class Player():
             id = game['info']['participants'][i]['puuid']
             if (id==user.puuid) or (id==self.puuid):
                 playerCounter += 1
+        
         if playerCounter == 2:
             return True
         else:
             return False
+
     def won_game(self, game) -> bool:
         for i in range(10):
             if (game['info']['participants'][i]['puuid'] == self.puuid):
@@ -57,8 +55,8 @@ def in_same_game(player1:Player, player2:Player) -> bool:
     mostRecentMatch = player1.get_most_recent_match()
     return player1.in_game_with(player2, mostRecentMatch)
 
-##=======================Testing of Functions===================
 
+##=======================Testing of Functions===================
 
 def testing():
 
