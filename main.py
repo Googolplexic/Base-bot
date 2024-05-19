@@ -252,24 +252,6 @@ async def check_match_length(matchList):
                     return 0  
 
 
-
-
-        async def check_match_length(matchList):
-            prevMatchCount = len(matchList)
-            for _ in range(3): 
-                start_time = time.time()
-                await asyncio.sleep(5)  
-                end_time = time.time()
-                print(len(matchList))
-                print(prevMatchCount +1)
-                if len(matchList) == prevMatchCount + 1:
-                    print("returning 1")
-                    return 1
-                else:
-                    prevMatchCount = len(matchList) 
-                    print("Match Invalid: Length Too Long")
-                    return 0  
-
         
     # P1 = Player(db.get(str(user) + "apikey")   ,"choopedpotat", "Bruhy")
     
@@ -317,22 +299,56 @@ async def check_match_length(matchList):
 
 
 
+async def singles(interaction: nextcord.Interaction, protagonist: nextcord.User) -> None:
+    global inprogress
+    duel_over = False
+    if inprogress == 1:
+        await interaction.response.send_message("Match already in progress. Please wait for it to end.")
+    else:
+        await interaction.response.send_message("Awaiting Opponent Response")
+        user = await bot.fetch_user(interaction.user.id)
+        db.set("Player 1",str(user))
+        print(user)
+        user2 = await bot.fetch_user(opponent.id)
+        db.set("Player 2", str(user2))
+        print(user2)
+        
+        view = buttonMenu()
 
-        async def check_match_length(matchList):
-            prevMatchCount = len(matchList)
-            for _ in range(3): 
-                start_time = time.time()
-                await asyncio.sleep(5)  
-                end_time = time.time()
-                print(len(matchList))
-                print(prevMatchCount +1)
-                if len(matchList) == prevMatchCount + 1:
-                    print("returning 1")
-                    return 1
-                else:
-                    prevMatchCount = len(matchList) 
-                    print("Match Invalid: Length Too Long")
-                    return 0  # Assuming a return value of 0 to indicate invalid match
+        await user2.send("accept or deny the duel lol", view=view)
+        await view.wait()
+
+        if view.value is None:
+            return
+        elif view.value:
+            inprogress = 1
+            print('YAH')
+            embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
+            embed.add_field(name=(f"{user.name}\'s KDA").ljust(50),value= (f"{user.name}\'s kda data here").ljust(50), inline=True)
+            embed.add_field(name=(f"{user2.name}\'s KDA").rjust(50),value= (f"{user2.name}\'s kda data here").rjust(50),inline=True)
+
+            print(str(user))
+            print(db.get(str(user) + "apikey"))
+            P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
+            
+            await interaction.edit_original_message(content=None, embed=embed)
+
+    async def check_match_length(matchList):
+                prevMatchCount = len(matchList)
+                for _ in range(3): 
+                    start_time = time.time()
+                    await asyncio.sleep(5)  
+                    end_time = time.time()
+                    print(len(matchList))
+                    print(prevMatchCount +1)
+                    if len(matchList) == prevMatchCount + 1:
+                        print("returning 1")
+                        return 1
+                    else:
+                        prevMatchCount = len(matchList) 
+                        print("Match Invalid: Length Too Long")
+                        return 0  
+
 
     # =================Isitha was involved here proceed with caution ================    
     P1 = Player(db.get(str(user) + "apikey") , db.get(str(user) + "gamename"), db.get(str(user) + "tagline"))
@@ -350,16 +366,6 @@ async def check_match_length(matchList):
         winbed.add_field(value=f"CHAMPION: :sparkles: {chosen_winner.name} :sparkles:".center())
         await interaction.edit_original_message(content=None,embed=winbed)
 
-        for i in better_list:
-            tempusr = str(bot.fetch_user(i))
-            if db.get(tempusr+"betusr") == str(chosen_winner): 
-                db.set(tempusr+"currency",str((int(db.get(tempusr+"betamt"))*2) + int(db.get(tempusr+"currency"))))
-                db.set(tempusr+"betamt", '0')
-                db.set(tempusr+"betusr", "")
-            else:
-                db.set(tempusr+"currency",str(int(db.get(tempusr+"currency")) - int(db.get(tempusr+"betamt"))))
-                db.set(tempusr+"betamt", '0')
-                db.set(tempusr+"betusr", "")
 
 
 
