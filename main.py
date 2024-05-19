@@ -96,6 +96,31 @@ async def cancel(ctx: nextcord.Interaction) -> None:
         await ctx.response.send_message('Match in progress cancelled') 
 
 @bot.slash_command(
+        name = "claim",
+        description = "Claim your daily betting allowance",
+    guild_ids = GUILD_ID
+)
+async def test(ctx: nextcord.Interaction) -> None:
+    author = str(ctx.user) # We get the username (RobertK#6151)
+    if not db.exists(author+"currency"): # If username is not already in the database
+        await ctx.response.send_message(f'Unable to get currency associated with "{ctx.user}"', ephemeral = True) # Make profile for username in database or it will error
+    else:
+        curr = db.get(author + "currency")
+        curr+= 1000
+        await ctx.response.send_message(f'"{ctx.user}" now has ${curr} in the bank', ephemeral = True)
+
+@commands.cooldown(1, 300, commands.BucketType.user)      
+async def my_command(ctx):
+    await ctx.send("Claimed!")
+
+# CD
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        await ctx.send(f"This command is on cooldown. Please try again in {int(error.retry_after)} seconds.")
+    else:
+        raise error
+
+@bot.slash_command(
     name = "addcurrency",
     description = "Adds currency (admin only)",
     guild_ids= GUILD_ID
