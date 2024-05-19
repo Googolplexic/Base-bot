@@ -29,22 +29,10 @@ intents.message_content = True
 
 bot = commands.Bot()
 client = Client(intents=intents)
-#tree = application_command.CommandTree(client)
-#client.tree = tree
 load_dotenv()
 
+better_list = []
 prefix = "!"
-'''def get_summoner_data(summoner_name):
-    url = RIOT_API_URL.replace('REGION', 'YOUR_REGION') + summoner_name
-    headers = {
-        'X-Riot-Token': RIOT_API_KEY
-    }
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
-'''
 
 @bot.event
 async def on_ready():
@@ -94,13 +82,25 @@ async def dispcurrency(ctx: nextcord.Interaction) -> None:
         curr = db.get(author + "currency")
         await ctx.response.send_message(f'"{ctx.user}" has ${curr} in the bank', ephemeral = True)
     
+@bot.slash_command(
+    name = "cancel",
+    description = "cancels current match",
+    guild_ids= GUILD_ID
+)
+async def dispcurrency(ctx: nextcord.Interaction) -> None:
+    author = str(ctx.user) # We get the username (RobertK#6151)
+    if not db.exists(author+"currency"): # If username is not already in the database
+        await ctx.response.send_message(f'Unable to get currency associated with "{ctx.user}"', ephemeral = True) # Make profile for username in database or it will error
+    else: 
+        curr = db.get(author + "currency")
+        await ctx.response.send_message(f'"{ctx.user}" has ${curr} in the bank', ephemeral = True)
 
 @bot.slash_command(
     name = "addcurrency",
     description = "Adds Currency if admin",
     guild_ids= GUILD_ID
 )
-@application_checks.has_permissions(manage_messages=True)
+@application_checks.has_permissions(administrator=True)
 async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
     author = str(usr) # We get the username (RobertK#6151)
     if not db.exists(author+"currency"): # If username is not already in the database
@@ -118,11 +118,10 @@ async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
     guild_ids= GUILD_ID
 )
 async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int):
-    author = str(ctx.user) # We get the username (RobertK#6151)
-    # If username is not already in the database
+    author = str(ctx.user) 
     global inprogress
     global better_list
-    better_list = []
+   
 
     better_list.append(usr.id)
 
@@ -139,8 +138,7 @@ async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int):
         db.set(author+"betusr", str(usr))
         await ctx.response.send_message(f'"{ctx.user}" bets ${amt} on "{usr}"', ephemeral = True)
     else:
-        await ctx.response.send_message(f'"{usr}" is not currently in a match', ephemeral = True)
-# ==============Isitha's shit code ends    
+        await ctx.response.send_message(f'"{usr}" is not currently in a match', ephemeral = True) 
 
 class buttonMenu(nextcord.ui.View):
     def __init__(self):
@@ -149,23 +147,27 @@ class buttonMenu(nextcord.ui.View):
     
     @nextcord.ui.button(label = 'Accept', style=nextcord.ButtonStyle.green)
     async def confirm(self, button:nextcord.ui.Button, interaction:nextcord.Interaction):
-        #this happens when it is pressed 
         await interaction.response.send_message('yes is press', ephemeral=False)
         self.value = True
         self.stop()
 
     @nextcord.ui.button(label = 'Decline', style=nextcord.ButtonStyle.red)
     async def deny(self, button:nextcord.ui.Button, interaction:nextcord.Interaction):
-        #this happens when it is pressed 
         await interaction.response.send_message('no is press', ephemeral=False)
         self.value = True
         self.stop()
 
 print("cheese!")
-# Add the guild ids in which the slash command will appear.
-# If it should be in all, remove the argument, but note that
-# it will take some time (up to an hour) to register the
-# command if it's for all guilds.
+
+@bot.slash_command(
+    name="choose-winner",
+    description="choose the winner of the ongoing duel (demo fix, read the README.md)",
+    guild_ids = GUILD_ID
+)
+async def chooseWinner(interaction: nextcord.Interaction, player1: nextcord.User, player2 nextcord.User) -> None:
+    player1 = db.get("Player 1")
+
+
 @bot.slash_command(
     name="duel",
     description="Enter an opponent's discord username to send them a duel invitation",
@@ -177,9 +179,7 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         await interaction.response.send_message("Match already in progress. Please wait for it to end.")
     else:
         await interaction.response.send_message("Awaiting Opponent Response")
-        #gets player 1
         user = await bot.fetch_user(interaction.user.id)
-        #gets player 2
         db.set("Player 1",str(user))
         print(user)
         user2 = await bot.fetch_user(opponent.id)
@@ -194,7 +194,6 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         if view.value is None:
             return
         elif view.value:
-            #do this
             inprogress = 1
             print('YAH')
             embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
@@ -206,15 +205,13 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
             P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
             
             await interaction.edit_original_message(content=None, embed=embed)
-        #i changed a comment
 
 
         async def check_match_length(matchList):
             prevMatchCount = len(matchList)
-
-            for _ in range(3):  # Loop 3 times 
+            for _ in range(3): 
                 start_time = time.time()
-                await asyncio.sleep(5)  # Non-blocking sleep for 5 seconds
+                await asyncio.sleep(5)  
                 end_time = time.time()
                 print(len(matchList))
                 print(prevMatchCount +1)
@@ -222,7 +219,7 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
                     print("returning 1")
                     return 1
                 else:
-                    prevMatchCount = len(matchList)  # Update the previous match count
+                    prevMatchCount = len(matchList) 
                     print("Match Invalid: Length Too Long")
                     return 0  # Assuming a return value of 0 to indicate invalid match
 
@@ -238,7 +235,6 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
     
     # ================================================================================
 
-    #when the duel is won by one party or the other
     if inprogress == 1 and duel_over == True:
         winbed = nextcord.Embed(color= 0x6DDE62, title='DUEL RESULTS: ' +user.name+' VS '+user2.name)
         winbed.add_field(value=f"CHAMPION: :sparkles: {winner.name} :sparkles:".center())
