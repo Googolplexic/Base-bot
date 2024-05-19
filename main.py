@@ -58,7 +58,23 @@ async def test(ctx: nextcord.Interaction, uid: str) -> None:
         await ctx.response.send_message(f'API key "{uid}" associated with "{ctx.user}" is now registered', ephemeral = True) # Make profile for username in database or it will error
     else: 
         await ctx.response.send_message(f'"{uid}" already registered with user "{ctx.user}"', ephemeral = True)
+
+# ==============Isithas shit code begins
+
+@bot.slash_command(
+    name = "dispcurrency",
+    description = "Display Currency",
+    guild_ids= GUILD_ID
+)
+async def test(ctx: nextcord.Interaction) -> None:
+    author = str(ctx.user) # We get the username (RobertK#6151)
+    if not db.exists(author+"currency"): # If username is not already in the database
+        await ctx.response.send_message(f'Unable to get currency associated with "{ctx.user}"', ephemeral = True) # Make profile for username in database or it will error
+    else: 
+        curr = db.get(author + "currency")
+        await ctx.response.send_message(f'"{ctx.user}" has ${curr} in the bank', ephemeral = True)
     
+# ==============Isitha's shit code ends    
 
 class buttonMenu(nextcord.ui.View):
     def __init__(self):
