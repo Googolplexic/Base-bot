@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 import requests
 import time
+import asyncio
 
 import nextcord
 from nextcord.ext import commands
@@ -133,12 +134,12 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
     #awidjaijdiawjd 
 
 
-    def check_match_length(matchList):
+    async def check_match_length(matchList):
         prevMatchCount = len(matchList)
 
         for _ in range(3):  # Loop 3 times 
             start_time = time.time()
-            time.sleep(5)  # Sleep for 1800 seconds (30 minutes)
+            await asyncio.sleep(5)  # Non-blocking sleep for 5 seconds
             end_time = time.time()
 
             if len(matchList) == prevMatchCount + 1:
@@ -149,10 +150,11 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         print("Match Invalid: Length Too Long")
         return 0  # Assuming a return value of 0 to indicate invalid match
 
-        
-    P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
-    mlist = P1.get_matchlist
-    check_match_length(mlist)
+    async def main():
+        P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
+        mlist = await P1.get_matchlist()
+        result = await check_match_length(mlist)
+        print(result)
 
 
 
