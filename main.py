@@ -269,7 +269,6 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         elif view.value:
             inprogress = 1
             embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
-            P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
             
             await interaction.edit_original_message(content=None, embed=embed, view = can)
             await can.wait()
