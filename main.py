@@ -132,12 +132,13 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         await interaction.edit_original_message(content=None, embed=embed)
     #awidjaijdiawjd 
 
+
     def check_match_length(matchList):
         prevMatchCount = len(matchList)
 
-        for _ in range(3):  # Loop 3 times
+        for _ in range(3):  # Loop 3 times 
             start_time = time.time()
-            time.sleep(1800)  # Sleep for 1800 seconds (30 minutes)
+            time.sleep(5)  # Sleep for 1800 seconds (30 minutes)
             end_time = time.time()
 
             if len(matchList) == prevMatchCount + 1:
@@ -149,7 +150,9 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         return 0  # Assuming a return value of 0 to indicate invalid match
 
         
-    
+    P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
+    mlist = P1.get_matchlist
+    check_match_length(mlist)
 
 
 
