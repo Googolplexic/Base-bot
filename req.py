@@ -1,8 +1,5 @@
 from riotwatcher import LolWatcher, RiotWatcher, ApiError
-import json
 
-API_KEY = "RGAPI-b6af20cb-4e3a-4afa-acb2-571f3a71ac03"
-#API_KEY = "RGAPI-93300605-bf88-4d55-ad19-5055c0710c3e"
 
 class Player():
     def __init__(self, API_KEY , game_name, tag_line, region="AMERICAS"):
@@ -14,8 +11,6 @@ class Player():
 
 
     def get_puuid(self):
-        lol_watcher = LolWatcher(self.API_KEY)
-
         riot_watcher = RiotWatcher(self.API_KEY)
 
         my_account = riot_watcher.account.by_riot_id(self.region, self.game_name, self.tag_line)
@@ -45,28 +40,35 @@ class Player():
             return True
         else:
             return False
+    def won_game(self, game):
+        for i in range(10):
+            if (game['info']['participants'][i]['puuid'] == self.puuid):
+                return game['info']['participants'][i]['win']
+
+            
+##=======================Testing of Functions===================
 
 
-# print("start")
-william = Player(API_KEY, "choopedpotat", "Bruhy")
-# print("done")
-print(william.get_puuid())
+def testing():
+
+    API_KEY = "RGAPI-b6af20cb-4e3a-4afa-acb2-571f3a71ac03"
+    #API_KEY = "RGAPI-93300605-bf88-4d55-ad19-5055c0710c3e"
+    
+    
+    # print("start")
+    william = Player(API_KEY, "choopedpotat", "Bruhy")
+    # print("done")
+    print(william.get_puuid())
 
 
-mlist = william.get_matchlist()
-print(mlist)
-game = william.match_data(mlist[1])
-print(game)
-for i in range(10):
-    print(game['info']['participants'][i]['puuid'])
+    mlist = william.get_matchlist()
+    print(mlist)
+    for i in range(6):
+        game = william.match_data(mlist[i])
+        # print(game)
 
-# print()
+        print(william.won_game(game))
 
-# puuid = get_puuid(API_KEY)
-# print(puuid)
 
-# ee = get_match(API_KEY, puuid)
-# print(ee)
-
-# Match = match_info(API_KEY, ee[2])
-# print(Match['metadata']['participants'])
+if (__name__ == "__main__"):
+    testing()

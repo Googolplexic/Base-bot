@@ -13,6 +13,8 @@ from nextcord import Intents
 from nextcord import Client
 from nextcord import application_command
 import pickledb
+from req import Player
+
 db = pickledb.load('discord.db', True)
 
 GUILD_ID = [1241468028378677308]
