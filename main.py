@@ -16,7 +16,7 @@ from nextcord import Intents
 from nextcord import Client
 from nextcord.ext import application_checks
 import pickledb
-from req import Player
+from req import Player, in_same_game
 tracemalloc.start()
 db = pickledb.load('discord.db', True)
 db.set("Player 1", "")
@@ -84,11 +84,25 @@ async def dispcurrency(ctx: nextcord.Interaction) -> None:
     
 
 @bot.slash_command(
+    name = "cancel",
+    description = "cancels current match",
+    guild_ids = GUILD_ID
+)
+async def cancel(ctx: nextcord.Interaction) -> None:
+    global inprogress
+    if inprogress == 0:
+        await ctx.response.send_message('No match in progress', ephemeral = True) 
+    else: 
+        inprogress == 0
+        better_list = []
+        await ctx.response.send_message('Match in progress cancelled') 
+
+@bot.slash_command(
     name = "addcurrency",
     description = "Adds Currency if admin",
     guild_ids= GUILD_ID
 )
-@application_checks.has_permissions(manage_messages=True)
+@application_checks.has_permissions(administrator=True)
 async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
     author = str(usr) # We get the username (RobertK#6151)
     if not db.exists(author+"currency"): # If username is not already in the database
@@ -221,6 +235,21 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
             
             await interaction.edit_original_message(content=None, embed=embed)
 
+async def check_match_length(matchList):
+            prevMatchCount = len(matchList)
+            for _ in range(3): 
+                start_time = time.time()
+                await asyncio.sleep(5)  
+                end_time = time.time()
+                print(len(matchList))
+                print(prevMatchCount +1)
+                if len(matchList) == prevMatchCount + 1:
+                    print("returning 1")
+                    return 1
+                else:
+                    prevMatchCount = len(matchList) 
+                    print("Match Invalid: Length Too Long")
+                    return 0  
 
 
 
@@ -243,7 +272,7 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
 
         
     # P1 = Player(db.get(str(user) + "apikey")   ,"choopedpotat", "Bruhy")
-
+    
     
 
 
@@ -303,15 +332,18 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
                 else:
                     prevMatchCount = len(matchList) 
                     print("Match Invalid: Length Too Long")
-                    return 0  
+                    return 0  # Assuming a return value of 0 to indicate invalid match
 
-        
-    P1 = Player(db.get(str(user) + "apikey")   ,"choopedpotat", "Bruhy")
+    # =================Isitha was involved here proceed with caution ================    
+    P1 = Player(db.get(str(user) + "apikey") , db.get(str(user) + "gamename"), db.get(str(user) + "tagline"))
     mlist = P1.get_matchlist()
     await check_match_length(mlist)
     await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
-
-    
+    match = P1.get_most_recent_match()
+        #add function for checking who won
+        if P1.won_game(match):
+            # distribute winnings   
+    winner = user
 
     if inprogress == 1 and duel_over == True:
         winbed = nextcord.Embed(color= 0x6DDE62, title='DUEL RESULTS: ' +user.name+' VS '+user2.name)

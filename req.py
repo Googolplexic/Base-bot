@@ -1,5 +1,5 @@
 from riotwatcher import LolWatcher, RiotWatcher, ApiError
-
+from time import sleep
 
 class Player():
     def __init__(self, API_KEY , game_name, tag_line, region="AMERICAS"):
@@ -85,29 +85,32 @@ def testing():
 
 
 def game_data_collect():
+    
     API_KEY = "RGAPI-b6af20cb-4e3a-4afa-acb2-571f3a71ac03"
     william = Player(API_KEY, "choopedpotat", "Bruhy")
-    howard = Player("RGAPI-7102b893-0f9e-4102-8dbb-991d8fabbc5a", "wurrd", "0000")
-    print("=================== William ========================= \n\n")
+    # howard = Player("RGAPI-7102b893-0f9e-4102-8dbb-991d8fabbc5a", "wurrd", "0000")
+    # print("=================== William ========================= \n\n")
     print(william.get_matchlist())
-    WmostRecent = william.get_most_recent_match()
-    print(str(WmostRecent["metadata"]).replace(",",",\n"))
-    print("created:", WmostRecent["info"]["gameCreation"])
-    print("end time stamp: ", WmostRecent["info"]["gameEndTimestamp"])
-    print("gameId: ", WmostRecent["info"]["gameId"])
-    print("gameMode: ", WmostRecent["info"]["gameMode"])
-    print("won game: ", william.won_game(WmostRecent))
+    print(william.match_data(william.get_matchlist()[0]))
+    # WmostRecent = william.get_most_recent_match()
+    # print(str(WmostRecent["metadata"]).replace(",",",\n"))
+    # print("created:", WmostRecent["info"]["gameCreation"])
+    # print("end time stamp: ", WmostRecent["info"]["gameEndTimestamp"])
+    # print("gameId: ", WmostRecent["info"]["gameId"])
+    # print("gameMode: ", WmostRecent["info"]["gameMode"])
+    # print("won game: ", william.won_game(WmostRecent))
+    # sleep(10)
 
 
-    print("=================== Howard ========================= \n\n")
-    print(howard.get_matchlist())
-    HmostRecent = howard.get_most_recent_match()
-    print(str(HmostRecent["metadata"]).replace(",",",\n"))
-    print("created:", HmostRecent["info"]["gameCreation"])
-    print("end time stamp: ", HmostRecent["info"]["gameEndTimestamp"])
-    print("gameId: ", HmostRecent["info"]["gameId"])
-    print("gameMode: ", HmostRecent["info"]["gameMode"])
-    print("won game: ", howard.won_game(HmostRecent))
+    # print("=================== Howard ========================= \n\n")
+    # print(howard.get_matchlist())
+    # HmostRecent = howard.get_most_recent_match()
+    # print(str(HmostRecent["metadata"]).replace(",",",\n"))
+    # print("created:", HmostRecent["info"]["gameCreation"])
+    # print("end time stamp: ", HmostRecent["info"]["gameEndTimestamp"])
+    # print("gameId: ", HmostRecent["info"]["gameId"])
+    # print("gameMode: ", HmostRecent["info"]["gameMode"])
+    # print("won game: ", howard.won_game(HmostRecent))
 
 
 if (__name__ == "__main__"):
