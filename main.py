@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import requests
 import time
 import asyncio
+import tracemalloc
 
 import nextcord
 from nextcord.ext import commands
@@ -16,7 +17,7 @@ from nextcord import Client
 from nextcord.ext import application_checks
 import pickledb
 from req import Player
-
+tracemalloc.start()
 db = pickledb.load('discord.db', True)
 db.set("Player 1", "")
 db.set("Player 2", "")
@@ -202,38 +203,30 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         #i changed a comment
 
 
-    async def check_match_length(matchList):
-        prevMatchCount = len(matchList)
+        async def check_match_length(matchList):
+            prevMatchCount = len(matchList)
 
-        for _ in range(3):  # Loop 3 times 
-            start_time = time.time()
-            await asyncio.sleep(5)  # Non-blocking sleep for 5 seconds
-            end_time = time.time()
-
-            if len(matchList) == prevMatchCount + 1:
-                return 1
-            else:
-                prevMatchCount = len(matchList)  # Update the previous match count
-
-            print("Match Invalid: Length Too Long")
-
-            return 0  # Assuming a return value of 0 to indicate invalid match
+            for _ in range(3):  # Loop 3 times 
+                start_time = time.time()
+                await asyncio.sleep(5)  # Non-blocking sleep for 5 seconds
+                end_time = time.time()
+                print(len(matchList))
+                print(prevMatchCount +1)
+                if len(matchList) == prevMatchCount + 1:
+                    print("returning 1")
+                    return 1
+                else:
+                    prevMatchCount = len(matchList)  # Update the previous match count
+                    print("Match Invalid: Length Too Long")
+                    return 0  # Assuming a return value of 0 to indicate invalid match
 
         
-    P1 = Player(db.get(str(user) + "apikey")    ,"choopedpotat", "Bruhy")
+    P1 = Player(db.get(str(user) + "apikey")   ,"choopedpotat", "Bruhy")
     mlist = P1.get_matchlist()
-    if check_match_length(mlist) == 0:
-        await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
+    await check_match_length(mlist)
+    await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
 
     #when the duel is won by one party or the other
-    
-    async def other_main():
-        P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
-        mlist = await P1.get_matchlist()
-        result = await check_match_length(mlist)
-        print(result)
-    
-    asyncio.run(other_main())
 
 
 
@@ -298,3 +291,4 @@ except nextcord.HTTPException as e:
         )
     else:
         raise e
+tracemalloc.stop()
