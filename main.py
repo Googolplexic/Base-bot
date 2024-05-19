@@ -367,22 +367,6 @@ async def singles(interaction: nextcord.Interaction) -> None:
             
             await interaction.edit_original_message(content=None, embed=embed)
 
-    async def check_match_length(matchList):
-                prevMatchCount = len(matchList)
-                for _ in range(3): 
-                    start_time = time.time()
-                    await asyncio.sleep(5)  
-                    end_time = time.time()
-                    print(len(matchList))
-                    print(prevMatchCount +1)
-                    if len(matchList) == prevMatchCount + 1:
-                        print("returning 1")
-                        return 1
-                    else:
-                        prevMatchCount = len(matchList) 
-                        print("Match Invalid: Length Too Long")
-                        return 0  
-
 
     # =================Isitha was involved here proceed with caution ================    
         P1 = Player(db.get(str(user) + "apikey") , db.get(str(user) + "gamename"), db.get(str(user) + "tagline"))
