@@ -15,9 +15,11 @@ from nextcord import Client
 from nextcord.ext import application_checks
 import pickledb
 from req import Player
-inprogress = 0
-db = pickledb.load('discord.db', True)
 
+db = pickledb.load('discord.db', True)
+db.set("Player 1", "")
+db.set("Player 2", "")
+inprogress = 0
 GUILD_ID = [1241468028378677308]
 
 intents = Intents.default()
@@ -106,6 +108,31 @@ async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
         db.set(author+"currency", db.get(author+"currency")+add)
         curr = db.get(author + "currency")
         await ctx.response.send_message(f'"{usr}" now has ${curr} in the bank', ephemeral = True)
+
+
+@bot.slash_command(
+    name = "bet",
+    description = "bettt",
+    guild_ids= GUILD_ID
+)
+async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int):
+    author = str(ctx.user) # We get the username (RobertK#6151)
+    # If username is not already in the database
+    global inprogress
+    if inprogress == 0:
+        await ctx.response.send_message(f'Invalid bet: No match in progress', ephemeral = True)
+    elif not db.exists(author+"currency"):
+        await ctx.response.send_message(f'Invalid bet: You do not have any currency, please ask an admin to start', ephemeral = True)
+    elif amt <= 0:
+        await ctx.response.send_message(f'Invalid bet: Please enter a positive integer for your bet', ephemeral = True)
+    elif db.get(author + "currency") < amt:
+        await ctx.response.send_message(f'Invalid bet: You are too poor bet this amount', ephemeral = True)
+    elif db.get("Player 1") == str(usr) or db.get("Player 2") == str(usr):
+        db.set(author+"betamt", amt)
+        db.set(author+"betusr", str(usr))
+        await ctx.response.send_message(f'"{ctx.user}" bets ${amt} on "{usr}"', ephemeral = True)
+    else:
+        await ctx.response.send_message(f'"{usr}" is not currently in a match', ephemeral = True)
 # ==============Isitha's shit code ends    
 
 class buttonMenu(nextcord.ui.View):
@@ -137,6 +164,7 @@ print("cheese!")
     description="Enter an opponent's discord username to send them a duel invitation",
 )
 async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> None:
+    global inprogress
     if inprogress == 1:
         await interaction.response.send_message("Match already in progress. Please wait for it to end.")
     else:
@@ -144,10 +172,10 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         #gets player 1
         user = await bot.fetch_user(interaction.user.id)
         #gets player 2
-        db.set("Player 1",user)
+        db.set("Player 1",str(user))
         print(user)
         user2 = await bot.fetch_user(opponent.id)
-        db.set("Player 2", user2)
+        db.set("Player 2", str(user2))
         print(user2)
         
         view = buttonMenu()
