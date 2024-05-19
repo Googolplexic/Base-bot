@@ -207,8 +207,7 @@ async def my_command(ctx):
     await ctx.send("Claimed!")
 
 # CD
-@my_command.error
-async def my_command_error(ctx, error):
+async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.send(f"This command is on cooldown. Please try again in {int(error.retry_after)} seconds.")
     else:
