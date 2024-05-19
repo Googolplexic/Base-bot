@@ -31,6 +31,7 @@ bot = commands.Bot()
 client = Client(intents=intents)
 load_dotenv()
 
+better_list = []
 prefix = "!"
 
 @bot.event
@@ -120,7 +121,7 @@ async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int):
     author = str(ctx.user) 
     global inprogress
     global better_list
-    better_list = []
+   
 
     better_list.append(usr.id)
 
@@ -157,6 +158,16 @@ class buttonMenu(nextcord.ui.View):
         self.stop()
 
 print("cheese!")
+
+@bot.slash_command(
+    name="choose-winner",
+    description="choose the winner of the ongoing duel (demo fix, read the README.md)",
+    guild_ids = GUILD_ID
+)
+async def chooseWinner(interaction: nextcord.Interaction, player1: nextcord.User, player2 nextcord.User) -> None:
+    player1 = db.get("Player 1")
+
+
 @bot.slash_command(
     name="duel",
     description="Enter an opponent's discord username to send them a duel invitation",
