@@ -1,5 +1,3 @@
-# This code is based on the following example:
-# https://discordpy.readthedocs.io/en/stable/quickstart.html#a-minimal-bot
 
 import os
 from dotenv import load_dotenv
@@ -117,10 +115,10 @@ async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
 
 @bot.slash_command(
     name = "bet",
-    description = "bet-to-win is for singles mode only, useless otherwise",
+    description = "bettt",
     guild_ids= GUILD_ID
 )
-async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int, bet_to_win: bool):
+async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int):
     author = str(ctx.user) 
     global inprogress
     global better_list
@@ -137,15 +135,6 @@ async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int, bet_to_wi
             await ctx.response.send_message(f'Invalid bet: Please enter a positive integer for your bet', ephemeral = True)
         elif int(db.get(author + "currency")) < amt:
             await ctx.response.send_message(f'Invalid bet: You are too poor bet this amount', ephemeral = True)
-        elif db.get("Player 1") ==db.get("Player 2"):
-            if bet_to_win == True:
-                db.set(author+"betamt", amt)
-                db.set(author+"betusr", "W"+str(usr))
-                await ctx.response.send_message(f'"{ctx.user}" bets ${amt} on "{usr}" to win')
-            else:
-                db.set(author+"betamt", amt)
-                db.set(author+"betusr", "L"+str(usr))
-                await ctx.response.send_message(f'"{ctx.user}" bets ${amt} on "{usr}" to lose')
         elif db.get("Player 1") == str(usr) or db.get("Player 2") == str(usr):
             db.set(author+"betamt", amt)
             db.set(author+"betusr", str(usr))
@@ -236,10 +225,10 @@ async def chooseWinner(interaction: nextcord.Interaction, winner: nextcord.User)
                 print(tempu)
                 if db.get(str(tempu)+"betusr") == str(winner): 
                     db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"betamt")) + int(db.get(str(tempu)+"currency"))))
-                    await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                    await tempu.send(f"Your bet of ${db.get(str(tempu)+"betamt")} has hit! Your balance is now {db.get(str(tempu)+"currency")}")
                 else:
                     db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"currency")) - int(db.get(str(tempu)+"betamt"))))
-                    await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                    await tempu.send(f"Your bet of ${db.get(str(tempu)+"betamt")} did not hit! Your balance is now {db.get(str(tempu)+"currency")}")
             better_list= []
             inprogress = 0
         else:
@@ -250,7 +239,6 @@ async def chooseWinner(interaction: nextcord.Interaction, winner: nextcord.User)
 @bot.slash_command(
     name="duel",
     description="Enter an opponent's discord username to send them a duel invitation",
-    guild_ids = GUILD_ID
 )
 async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> None:
     global inprogress
@@ -354,17 +342,46 @@ async def singles(interaction: nextcord.Interaction) -> None:
         await interaction.response.send_message("Singles betting started")
         user = await bot.fetch_user(interaction.user.id)
         db.set("Player 1",str(user))
-        db.set("Player 2",str(user))
         print(user)
+        user2 = await bot.fetch_user(opponent.id)
+        db.set("Player 2", str(user2))
+        print(user2)
         
-        inprogress = 1
-        print('YAH')
-        embed = nextcord.Embed(color= 0xB9F5F1, title='SINGLE: ' +user.name)
+        view = buttonMenu()
 
-        print(str(user))
-        print(db.get(str(user) + "apikey"))
-        P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
-        
+        await user2.send("accept or deny the duel lol", view=view)
+        await view.wait()
+
+        if view.value is None:
+            return
+        elif view.value:
+            inprogress = 1
+            print('YAH')
+            embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
+            embed.add_field(name=(f"{user.name}\'s KDA").ljust(50),value= (f"{user.name}\'s kda data here").ljust(50), inline=True)
+            embed.add_field(name=(f"{user2.name}\'s KDA").rjust(50),value= (f"{user2.name}\'s kda data here").rjust(50),inline=True)
+
+            print(str(user))
+            print(db.get(str(user) + "apikey"))
+            P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
+            
+            await interaction.edit_original_message(content=None, embed=embed)
+
+    async def check_match_length(matchList):
+                prevMatchCount = len(matchList)
+                for _ in range(3): 
+                    start_time = time.time()
+                    await asyncio.sleep(5)  
+                    end_time = time.time()
+                    print(len(matchList))
+                    print(prevMatchCount +1)
+                    if len(matchList) == prevMatchCount + 1:
+                        print("returning 1")
+                        return 1
+                    else:
+                        prevMatchCount = len(matchList) 
+                        print("Match Invalid: Length Too Long")
+                        return 0  
 
 
     # =================Isitha was involved here proceed with caution ================    

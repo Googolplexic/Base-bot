@@ -1,15 +1,37 @@
 # Python Discord Bot
+By:
+William Chen https://github.com/Willywum
+Isitha Tennakoon https://github.com/IsithaT
+Coleman Lai https://github.com/Googolplexic
+Howard Jin https://github.com/Wurrd
 
-This is a starting point for making your own Discord bot using Python and the [discordpy](https://discordpy.readthedocs.io/) library.
-Read [their getting-started guides](https://discordpy.readthedocs.io/en/stable/#getting-started) to get the most out of this template.
+All SFU CS first years
 
-## Getting Started
+Python Discord bot using nextcord.
+built on a discord starter from 
+https://discordpy.readthedocs.io/en/stable/quickstart.html#a-minimal-bot
+and manipulated to work with nextcord for the Stormhacks 2024 hackathon
 
-To get set up, you'll need to follow [these bot account setup instructions](https://discordpy.readthedocs.io/en/stable/discord.html),
-and then copy the token for your bot and added it as a secret with the key of `TOKEN` in the "Secrets (Environment variables)" panel.
+first time doing a hackathon for all of us but it was fun
 
-## FAQ
+the bot lets you duel your friends in league of legends as well as other games
+your other friends can bet fake internet points on who might win
 
-If you get the following error message while trying to start the server: `429 Too Many Requests` (accompanied by a lot of HTML code), 
-try the advice given in this Stackoverflow question:
-https://stackoverflow.com/questions/66724687/in-discord-py-how-to-solve-the-error-for-toomanyrequests
+reads the league API to get last game data for singles mode
+
+the choose-winner slash command was implemented after we realized
+that we had to apply to a product forum on the riot developer website
+to get private match data, as it is considered private
+
+so we had to compromise and make this slash command.
+if we had the time, the path we would take is to get the oauth
+from riot to be able to access private matches and we would be able to 
+use the riot api to verify and complete matches
+
+i dont know what else you need to know, so go have fun
+wait no
+you need to change the GUILD_ID to match the id of the server the bot is invited to
+and you need to make a .env file to store the TOKEN for the bot.
+
+
+
