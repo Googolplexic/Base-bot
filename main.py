@@ -1,5 +1,3 @@
-# This code is based on the following example:
-# https://discordpy.readthedocs.io/en/stable/quickstart.html#a-minimal-bot
 
 import os
 from dotenv import load_dotenv
@@ -116,10 +114,10 @@ async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
 
 @bot.slash_command(
     name = "bet",
-    description = "bet-to-win is for singles mode only, useless otherwise",
+    description = "bettt",
     guild_ids= GUILD_ID
 )
-async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int, bet_to_win: bool):
+async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int):
     author = str(ctx.user) 
     global inprogress
     global better_list
@@ -137,15 +135,6 @@ async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int, bet_to_wi
             await ctx.response.send_message(f'Invalid bet: Please enter a positive integer for your bet', ephemeral = True)
         elif int(db.get(author + "currency")) < amt:
             await ctx.response.send_message(f'Invalid bet: You are too poor bet this amount', ephemeral = True)
-        elif db.get("Player 1") ==db.get("Player 2"):
-            if bet_to_win == True:
-                db.set(author+"betamt", amt)
-                db.set(author+"betusr", "W"+str(usr))
-                await ctx.response.send_message(f'"{ctx.user}" bets ${amt} on "{usr}" to win')
-            else:
-                db.set(author+"betamt", amt)
-                db.set(author+"betusr", "L"+str(usr))
-                await ctx.response.send_message(f'"{ctx.user}" bets ${amt} on "{usr}" to lose')
         elif db.get("Player 1") == str(usr) or db.get("Player 2") == str(usr):
             db.set(author+"betamt", amt)
             db.set(author+"betusr", str(usr))
@@ -169,17 +158,6 @@ class buttonMenu(nextcord.ui.View):
         await interaction.response.send_message('no is press', ephemeral=False)
         self.value = True
         self.stop()
-class singleButton(nextcord.ui.View):
-    def __init__(self):
-        super().__init__()
-        self.value = None
-    
-    @nextcord.ui.button(label = 'Match Over', style=nextcord.ButtonStyle.blurple)
-    async def confirm(self, button:nextcord.ui.Button, interaction:nextcord.Interaction):
-        await interaction.response.send_message('blurp is press', ephemeral=False)
-        self.value = True
-        self.stop()
-
 
 print("cheese!")
 
@@ -206,10 +184,10 @@ async def chooseWinner(interaction: nextcord.Interaction, winner: nextcord.User)
                 print(tempu)
                 if db.get(str(tempu)+"betusr") == str(winner): 
                     db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"betamt")) + int(db.get(str(tempu)+"currency"))))
-                    await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                    await tempu.send(f"Your bet of ${db.get(str(tempu)+"betamt")} has hit! Your balance is now {db.get(str(tempu)+"currency")}")
                 else:
                     db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"currency")) - int(db.get(str(tempu)+"betamt"))))
-                    await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                    await tempu.send(f"Your bet of ${db.get(str(tempu)+"betamt")} did not hit! Your balance is now {db.get(str(tempu)+"currency")}")
             better_list= []
             inprogress = 0
         else:
@@ -220,7 +198,6 @@ async def chooseWinner(interaction: nextcord.Interaction, winner: nextcord.User)
 @bot.slash_command(
     name="duel",
     description="Enter an opponent's discord username to send them a duel invitation",
-    guild_ids = GUILD_ID
 )
 async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> None:
     global inprogress
@@ -319,14 +296,9 @@ async def check_match_length(matchList):
 
 
 
-@bot.slash_command(
-    name="single",
-    description="Enter your discord username to start a match",
-    guild_ids = GUILD_ID
-)
+
 async def singles(interaction: nextcord.Interaction, protagonist: nextcord.User) -> None:
     global inprogress
-    global better_list
     duel_over = False
     if inprogress == 1:
         await interaction.response.send_message("Match already in progress. Please wait for it to end.")
@@ -334,55 +306,63 @@ async def singles(interaction: nextcord.Interaction, protagonist: nextcord.User)
         await interaction.response.send_message("Awaiting Opponent Response")
         user = await bot.fetch_user(interaction.user.id)
         db.set("Player 1",str(user))
-        db.set("Player 2",str(user))
         print(user)
+        user2 = await bot.fetch_user(opponent.id)
+        db.set("Player 2", str(user2))
+        print(user2)
         
-        inprogress = 1
-        print('YAH')
-        embed = nextcord.Embed(color= 0xB9F5F1, title='SINGLE: ' +user.name)
+        view = buttonMenu()
 
-        print(str(user))
-        print(db.get(str(user) + "apikey"))
-        P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
-        
+        await user2.send("accept or deny the duel lol", view=view)
+        await view.wait()
+
+        if view.value is None:
+            return
+        elif view.value:
+            inprogress = 1
+            print('YAH')
+            embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
+            embed.add_field(name=(f"{user.name}\'s KDA").ljust(50),value= (f"{user.name}\'s kda data here").ljust(50), inline=True)
+            embed.add_field(name=(f"{user2.name}\'s KDA").rjust(50),value= (f"{user2.name}\'s kda data here").rjust(50),inline=True)
+
+            print(str(user))
+            print(db.get(str(user) + "apikey"))
+            P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
+            
+            await interaction.edit_original_message(content=None, embed=embed)
+
+    async def check_match_length(matchList):
+                prevMatchCount = len(matchList)
+                for _ in range(3): 
+                    start_time = time.time()
+                    await asyncio.sleep(5)  
+                    end_time = time.time()
+                    print(len(matchList))
+                    print(prevMatchCount +1)
+                    if len(matchList) == prevMatchCount + 1:
+                        print("returning 1")
+                        return 1
+                    else:
+                        prevMatchCount = len(matchList) 
+                        print("Match Invalid: Length Too Long")
+                        return 0  
 
 
     # =================Isitha was involved here proceed with caution ================    
-        P1 = Player(db.get(str(user) + "apikey") , db.get(str(user) + "gamename"), db.get(str(user) + "tagline"))
-        veew = singleButton()
-        await interaction.edit_original_message(content=None, embed=embed, view = veew)
-        await veew.wait()
+    P1 = Player(db.get(str(user) + "apikey") , db.get(str(user) + "gamename"), db.get(str(user) + "tagline"))
+    mlist = P1.get_matchlist()
+    await check_match_length(mlist)
+    await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
+    match = P1.get_most_recent_match()
+        #add function for checking who won
+        if P1.won_game(match):
+            # distribute winnings   
+    winner = user
 
-        if veew.value is None:
-            return
-        elif veew.value:
-            match = P1.get_most_recent_match()
-                #add function for checking who won
-            for i in better_list:
-                tempu = await bot.fetch_user(i)
-                if P1.won_game(match):
-                    if db.get(str(tempu)+"betusr")[1] == "W":
-                        db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+'betamt')) + int(db.get(str(tempu)+'currency'))))
-                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now {db.get(str(tempu)+'currency')}")
-                    else:
-                        db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"currency")) - int(db.get(str(tempu)+"betamt"))))
-                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now {db.get(str(tempu)+'currency')}")
-                else:
-                    if db.get(str(tempu)+"betusr")[1] == "L":
-                        db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+'betamt')) + int(db.get(str(tempu)+'currency'))))
-                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now {db.get(str(tempu)+'currency')}")
-                    else:
-                        db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"currency")) - int(db.get(str(tempu)+"betamt"))))
-                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now {db.get(str(tempu)+'currency')}")
-            better_list= []
-            inprogress = 0
-        
-            winbed = nextcord.Embed(color= 0x6DDE62, title='DUEL RESULTS: ' +str(user))
-            if P1.won_game(match):
-                winbed.add_field(name ="WIN".center(50), value=f"CHAMPION: :sparkles: {user} :sparkles:".center(50))
-            else:
-                winbed.add_field(name ="LOSE".center(50), value=f"FALIURE: :raincloud: {user} :raincloud:".center(50))
-            await interaction.edit_original_message(content=None,embed=winbed)
+    if inprogress == 1 and duel_over == True:
+        winbed = nextcord.Embed(color= 0x6DDE62, title='DUEL RESULTS: ' +user.name+' VS '+user2.name)
+        winbed.add_field(value=f"CHAMPION: :sparkles: {chosen_winner.name} :sparkles:".center())
+        await interaction.edit_original_message(content=None,embed=winbed)
 
 
 
