@@ -14,7 +14,7 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
-
+client.tree = tree
 load_dotenv()
 
 prefix = "!"
@@ -51,28 +51,32 @@ async def on_ready():
 async def first_command(interaction):
     await interaction.response.send_message("Hello!")
 @tree.command(
-    name="cheeseInput",
+    name="cheeseinput",
     description="My first application Command",
     guild=discord.Object(id=1241468028378677308)
 )
 async def not_first_command(interaction):
     await interaction.response.send_message("cheese!")
-    
+
+# @tree.command(
+#     name = "getSummoner"
+#     description="get summoner data"
+#     guild=discord.Object(id=1241468028378677308)
+#     )
+# async def summoner(ctx, *, summoner_name):
+#     data = get_summoner_data(summoner_name)
+#     if data:
+#         await ctx.send(f"Summoner Name: {data['name']}\nSummoner Level: {data['summonerLevel']}")
+#     else:
+#         await ctx.send("Summoner not found or API error.")
+
 @tree.command(
-    name = "getSummoner"
-    description="get summoner data"
+    name = "echo",
+    description = "asdw",
     guild=discord.Object(id=1241468028378677308)
-    )
-async def summoner(ctx, *, summoner_name):
-    data = get_summoner_data(summoner_name)
-    if data:
-        await ctx.send(f"Summoner Name: {data['name']}\nSummoner Level: {data['summonerLevel']}")
-    else:
-        await ctx.send("Summoner not found or API error.")
-
-
-
-
+)
+async def echo(interaction: discord.Interaction, message: str) -> None:
+    await interaction.response.send_message(message)
 
 @tree.command(
     name="input-userid-api-id",
