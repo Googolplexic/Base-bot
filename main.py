@@ -95,28 +95,51 @@ async def cancel(ctx: nextcord.Interaction) -> None:
         better_list = []
         await ctx.response.send_message('Match in progress cancelled') 
 
+# A dictionary to keep track of cooldowns
+cooldowns = {}
+
 @bot.slash_command(
-        name = "claim",
-        description = "Claim your daily betting allowance",
-    guild_ids = GUILD_ID
+    name="claim",
+    description="Claim your daily betting allowance",
+    guild_ids=GUILD_ID
 )
-async def test(ctx: nextcord.Interaction) -> None:
-    author = str(ctx.user) # We get the username (RobertK#6151)
-    if not db.exists(author+"currency"): # If username is not already in the database
-        await ctx.response.send_message(f'Unable to get currency associated with "{ctx.user}"', ephemeral = True) # Make profile for username in database or it will error
+async def claim(ctx: nextcord.Interaction) -> None:
+    author = str(ctx.user)  # Get the username (RobertK#6151)
+
+    current_time = time.time()
+    cooldown_seconds = 300  # 5 minutes cooldown
+
+    # Check if the user is in cooldowns and if the cooldown period has not expired
+    if author in cooldowns and current_time - cooldowns[author] < cooldown_seconds:
+        retry_after = cooldown_seconds - (current_time - cooldowns[author])
+        await ctx.response.send_message(
+            f"This command is on cooldown. Please try again in {int(retry_after)} seconds.",
+            ephemeral=True
+        )
+        return
+
+    # Update the last claim time in cooldowns
+    cooldowns[author] = current_time
+
+    if not db.exists(author + "currency"):  # If username is not already in the database
+        await ctx.response.send_message(
+            f'Unable to get currency associated with "{ctx.user}"',
+            ephemeral=True
+        )
     else:
-        curr = db.get(author + "currency")
-        curr+= 1000
-        await ctx.response.send_message(f'"{ctx.user}" now has ${curr} in the bank', ephemeral = True)
+        db.set(author + "currency", db.get(author + "currency") + 1000)
+        await ctx.response.send_message(
+            f'"{ctx.user}" now has ${db.get(author + "currency")} in the bank',
+            ephemeral=True
+        )
 
-@commands.cooldown(1, 300, commands.BucketType.user)      
-async def my_command(ctx):
-    await ctx.send("Claimed!")
-
-# CD
-async def on_command_error(ctx, error):
+@bot.event
+async def on_application_command_error(interaction: nextcord.Interaction, error):
     if isinstance(error, commands.CommandOnCooldown):
-        await ctx.send(f"This command is on cooldown. Please try again in {int(error.retry_after)} seconds.")
+        await interaction.response.send_message(
+            f"This command is on cooldown. Please try again in {int(error.retry_after)} seconds.",
+            ephemeral=True
+        )
     else:
         raise error
 
