@@ -81,13 +81,25 @@ async def dispcurrency(ctx: nextcord.Interaction) -> None:
         curr = db.get(author + "currency")
         await ctx.response.send_message(f'"{ctx.user}" has ${curr} in the bank', ephemeral = True)
     
+@bot.slash_command(
+    name = "cancel",
+    description = "cancels current match",
+    guild_ids= GUILD_ID
+)
+async def dispcurrency(ctx: nextcord.Interaction) -> None:
+    author = str(ctx.user) # We get the username (RobertK#6151)
+    if not db.exists(author+"currency"): # If username is not already in the database
+        await ctx.response.send_message(f'Unable to get currency associated with "{ctx.user}"', ephemeral = True) # Make profile for username in database or it will error
+    else: 
+        curr = db.get(author + "currency")
+        await ctx.response.send_message(f'"{ctx.user}" has ${curr} in the bank', ephemeral = True)
 
 @bot.slash_command(
     name = "addcurrency",
     description = "Adds Currency if admin",
     guild_ids= GUILD_ID
 )
-@application_checks.has_permissions(manage_messages=True)
+@application_checks.has_permissions(administrator=True)
 async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
     author = str(usr) # We get the username (RobertK#6151)
     if not db.exists(author+"currency"): # If username is not already in the database
