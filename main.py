@@ -15,7 +15,7 @@ from nextcord import Client
 from nextcord.ext import application_checks
 import pickledb
 from req import Player
-
+inprogress = 0
 db = pickledb.load('discord.db', True)
 
 GUILD_ID = [1241468028378677308]
@@ -137,34 +137,40 @@ print("cheese!")
     description="Enter an opponent's discord username to send them a duel invitation",
 )
 async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> None:
-    await interaction.response.send_message("Awaiting Opponent Response")
-    #gets player 1
-    user = await bot.fetch_user(interaction.user.id)
-    #gets player 2
-    print(user)
-    user2 = await bot.fetch_user(opponent.id)
-    print(user2)
-    
-    view = buttonMenu()
-
-    await user2.send("accept or deny the duel lol", view=view)
-    await view.wait()
-
-    if view.value is None:
-        return
-    elif view.value:
-        #do this
-        print('YAH')
-        embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
-        embed.add_field(name=(f"{user.name}\'s KDA").ljust(50),value= (f"{user.name}\'s kda data here").ljust(50), inline=True)
-        embed.add_field(name=(f"{user2.name}\'s KDA").rjust(50),value= (f"{user2.name}\'s kda data here").rjust(50),inline=True)
-
-        print(str(user))
-        print(db.get(str(user) + "apikey"))
-        P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
+    if inprogress == 1:
+        await interaction.response.send_message("Match already in progress. Please wait for it to end.")
+    else:
+        await interaction.response.send_message("Awaiting Opponent Response")
+        #gets player 1
+        user = await bot.fetch_user(interaction.user.id)
+        #gets player 2
+        db.set("Player 1",user)
+        print(user)
+        user2 = await bot.fetch_user(opponent.id)
+        db.set("Player 2", user2)
+        print(user2)
         
-        await interaction.edit_original_message(content=None, embed=embed)
-    #i changed a comment
+        view = buttonMenu()
+
+        await user2.send("accept or deny the duel lol", view=view)
+        await view.wait()
+
+        if view.value is None:
+            return
+        elif view.value:
+            #do this
+            inprogress = 1
+            print('YAH')
+            embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
+            embed.add_field(name=(f"{user.name}\'s KDA").ljust(50),value= (f"{user.name}\'s kda data here").ljust(50), inline=True)
+            embed.add_field(name=(f"{user2.name}\'s KDA").rjust(50),value= (f"{user2.name}\'s kda data here").rjust(50),inline=True)
+
+            print(str(user))
+            print(db.get(str(user) + "apikey"))
+            P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
+            
+            await interaction.edit_original_message(content=None, embed=embed)
+        #i changed a comment
 
 
     def check_match_length(matchList):
