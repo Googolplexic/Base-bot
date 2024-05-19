@@ -121,6 +121,11 @@ async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int):
     author = str(ctx.user) # We get the username (RobertK#6151)
     # If username is not already in the database
     global inprogress
+    global better_list
+    better_list = []
+
+    better_list.append(usr.id)
+
     if inprogress == 0:
         await ctx.response.send_message(f'Invalid bet: No match in progress', ephemeral = True)
     elif not db.exists(author+"currency"):
@@ -167,6 +172,7 @@ print("cheese!")
 )
 async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> None:
     global inprogress
+    duel_over = False
     if inprogress == 1:
         await interaction.response.send_message("Match already in progress. Please wait for it to end.")
     else:
@@ -226,7 +232,25 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
     await check_match_length(mlist)
     await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
 
+    #add function for checking who won
+    winner = user
+
     #when the duel is won by one party or the other
+    if inprogress == 1 and duel_over == True:
+        winbed = nextcord.Embed(color= 0x6DDE62, title='DUEL RESULTS: ' +user.name+' VS '+user2.name)
+        winbed.add_field(value=f"CHAMPION: :sparkles: {winner.name} :sparkles:".center())
+        await interaction.edit_original_message(content=None,embed=winbed)
+
+    for i in better_list:
+        tempusr = str(bot.fetch_user(i))
+        if db.get(tempusr+"betusr") == str(winner): 
+            db.set(tempusr+"currency",str((int(db.get(tempusr+"betamt"))*2) + int(db.get(tempusr+"currency"))))
+            db.set(tempusr+"betamt", '0')
+            db.set(tempusr+"betusr", "")
+        else:
+            db.set(tempusr+"currency",str(int(db.get(tempusr+"currency")) - int(db.get(tempusr+"betamt"))))
+            db.set(tempusr+"betamt", '0')
+            db.set(tempusr+"betusr", "")
 
 
 
