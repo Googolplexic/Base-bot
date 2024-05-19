@@ -1,5 +1,5 @@
 from riotwatcher import LolWatcher, RiotWatcher, ApiError
-
+import json
 
 API_KEY = "RGAPI-b6af20cb-4e3a-4afa-acb2-571f3a71ac03"
 #API_KEY = "RGAPI-93300605-bf88-4d55-ad19-5055c0710c3e"
@@ -37,5 +37,5 @@ def match_info(key, matchID):
     ea = lol_watcher.match.by_id('AMERICAS', matchID);
     return ea
 
-matchinf = match_info(API_KEY, ee[2])
-print(matchinf)
+Match = match_info(API_KEY, ee[2])
+print(Match['metadata']['participants'])
