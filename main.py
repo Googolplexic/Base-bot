@@ -152,7 +152,7 @@ async def on_application_command_error(interaction: nextcord.Interaction, error)
 async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
     author = str(usr) 
     if not db.exists(author+"currency"): 
-        await ctx.response.send_message(f'No currency count associated "{usr}", adding an entry of ${add}', ephemeral = True) 
+        await ctx.response.send_message(f'No currency count associated with "{usr}", adding an entry of ${add}', ephemeral = True) 
         db.set(author+"currency", add)
     else: 
         db.set(author+"currency", db.get(author+"currency")+add)
