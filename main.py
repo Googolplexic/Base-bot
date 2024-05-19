@@ -3,19 +3,25 @@
 
 import os
 from dotenv import load_dotenv
-import discord
+
 import requests
 
-from discord import Intents
-from discord.ext import commands
-from discord import app_commands
+import nextcord
+from nextcord.ext import commands
+import nextcord.ext
+from nextcord import Intents
+from nextcord import Client
+from nextcord import application_command
 
-intents = discord.Intents.default()
+GUILD_ID = [1241468028378677308]
+
+intents = Intents.default()
 intents.message_content = True
 
-client = discord.Client(intents=intents)
-tree = discord.app_commands.CommandTree(client)
-client.tree = tree
+bot = commands.Bot()
+client = Client(intents=intents)
+#tree = application_command.CommandTree(client)
+#client.tree = tree
 load_dotenv()
 
 prefix = "!"
@@ -31,62 +37,87 @@ prefix = "!"
         return None
 '''
 
-@client.event
+@bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
-    await tree.sync(guild=discord.Object(id = 1241468028378677308))
+    print('We have logged in as {0.user}'.format(bot))
     print("Ready!")
 
 
 
-
+print("hi)")
 # Add the guild ids in which the slash command will appear.
 # If it should be in all, remove the argument, but note that
 # it will take some time (up to an hour) to register the
 # command if it's for all guilds.
-@tree.command(
-    name="commandname",
-    description="My first application Command",
-    guild=discord.Object(id=1241468028378677308)
+@bot.slash_command(
+    name="duel",
+    description="Enter an opponent's discord username to send them a duel invitation",
+    guild_ids= GUILD_ID
 )
-async def first_command(interaction):
-    await interaction.response.send_message("Hello!")
-@tree.command(
+async def duel(interaction: nextcord.Interaction, message: str) -> None:
+    await interaction.response.send_message("Awaiting Opponent Response")
+    #gets player 1
+    user = await bot.fetch_user(interaction.user.id)
+    #gets player 2
+    #user2 = await 
+    
+    
+
+    # await user.send("Hello there!")
+    # await interaction.response.send_message("sent!")
+    # await interaction.response.send_message("p1" + user.name)
+    # await interaction.response.send_message("p2" + user2.name)
+
+
+
+# @client.command()
+# async def info(ctx, user:discord.User):
+#     return await ctx.send(user.name)
+def get_user_id(server: nextcord.Guild, username: str) -> int:
+# Loop through all the members on the server
+    for member in server.members:
+        # Check if the member's username matches the specified username
+        if member.name == username:
+            return member.id
+    raise nextcord.errors.NotFound(f"User '{username}' not found on the server.")
+
+
+@bot.slash_command(
     name="cheeseinput",
     description="My first application Command",
-    guild=discord.Object(id=1241468028378677308)
+    guild_ids = GUILD_ID
 )
 async def not_first_command(interaction):
     await interaction.response.send_message("cheese!")
     
-@tree.command(
+@bot.slash_command(
     name = "echo",
     description = "asdw",
-    guild=discord.Object(id=1241468028378677308)
+    guild_ids=GUILD_ID
     )
-async def echo(interaction: discord.Interaction, message: str) -> None:
+async def echo(interaction: nextcord.Interaction, message: str) -> None:
     await interaction.response.send_message(message)
 
 
 
 
 
-@tree.command(
+@bot.slash_command(
     name="input-userid-api-id",
     description="direct messages the user and grabs a valid input",
-    guild=discord.Object(id=1241468028378677308)
+    guild_ids=GUILD_ID
 )
 async def on_message(interaction):
-    user = await client.fetch_user(interaction.user.id)
+    user = await bot.fetch_user(interaction.user.id)
     await user.send("Hello there!")
     await interaction.response.send_message("sent!")
 
 
 
 
-@client.event
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
 
     if message.content.lower() == (prefix + 'changeprefix'):
@@ -101,8 +132,8 @@ try:
     token = os.getenv("TOKEN") or ""
     if token == "":
         raise Exception("The Token doesn't exist")
-    client.run(token)
-except discord.HTTPException as e:
+    bot.run(token)
+except nextcord.HTTPException as e:
     if e.status == 429:
         print(
             "The Discord servers denied the connection for making too many requests"

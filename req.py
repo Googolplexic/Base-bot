@@ -11,7 +11,7 @@ def get_puuid(key):
 
     riot_watcher = RiotWatcher(key)
 
-    my_account = riot_watcher.account.by_riot_id('AMERICAS', 'choopedpotat', 'Bruhp')
+    my_account = riot_watcher.account.by_riot_id('AMERICAS', 'choopedpotat', 'Bruhy')
     # my_account = riot_watcher.account.by_riot_id('AMERICAS', 'ahtisi', 'cmpt')
 
     return (my_account['puuid'])
