@@ -42,9 +42,26 @@ async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
     print("Ready!")
 
+class buttonMenu(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.value = None
+    
+    @nextcord.ui.button(label = 'Accept', style=nextcord.ButtonStyle.green)
+    async def confirm(self, button:nextcord.ui.Button, interaction:nextcord.Interaction):
+        #this happens when it is pressed 
+        await interaction.response.send_message('yes is press', ephemeral=False)
+        self.value = True
+        self.stop()
 
+    @nextcord.ui.button(label = 'Decline', style=nextcord.ButtonStyle.red)
+    async def deny(self, button:nextcord.ui.Button, interaction:nextcord.Interaction):
+        #this happens when it is pressed 
+        await interaction.response.send_message('no is press', ephemeral=False)
+        self.value = True
+        self.stop()
 
-print("hi)")
+print("cheese!")
 # Add the guild ids in which the slash command will appear.
 # If it should be in all, remove the argument, but note that
 # it will take some time (up to an hour) to register the
@@ -54,15 +71,29 @@ print("hi)")
     description="Enter an opponent's discord username to send them a duel invitation",
     guild_ids= GUILD_ID
 )
-async def duel(interaction: nextcord.Interaction, message: str) -> None:
+async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> None:
     await interaction.response.send_message("Awaiting Opponent Response")
     #gets player 1
     user = await bot.fetch_user(interaction.user.id)
     #gets player 2
-    #user2 = await 
+    print(user)
+    user2 = await bot.fetch_user(opponent.id)
+    print(user2)
     
-    
+    view = buttonMenu()
 
+    await user2.send("accept or deny lol L", view=view)
+    await view.wait()
+
+    if view.value is None:
+        return
+    elif view.value:
+        #do this
+        print('NOH')
+    else:
+        #do that
+        print('YAH')
+    
     # await user.send("Hello there!")
     # await interaction.response.send_message("sent!")
     # await interaction.response.send_message("p1" + user.name)
