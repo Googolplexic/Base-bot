@@ -105,12 +105,14 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
     elif view.value:
         #do this
         print('YAH')
-        embed = nextcord.Embed(color= 0xB9F5F1, title='LETSS GO')
-        embed.add_field(name='iewruhfweiuhf',value= 'ewiufhewifhu',inline=False)
+        embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
+        embed.add_field(name=((f"{user.name}\'s KDA").ljust(50)  +  (f"{user2.name}\'s KDA").rjust(50)),value= ((f"{user.name}\'s kda data here").ljust(50) +    (f"{user2.name}\'s kda data here").rjust(50)),inline=True)
+
+        
         
         await interaction.edit_original_message(content=None, embed=embed)
     #awidjaijdiawjd
-    
+
 
     else:
         #do that
