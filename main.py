@@ -5,16 +5,17 @@ import os
 from dotenv import load_dotenv
 
 import requests
+import time
 
 import nextcord
 from nextcord.ext import commands
 import nextcord.ext
 from nextcord import Intents
 from nextcord import Client
-from nextcord import application_command
+from nextcord.ext import application_checks
 import pickledb
 from req import Player
-
+inprogress = 0
 db = pickledb.load('discord.db', True)
 
 GUILD_ID = [1241468028378677308]
@@ -48,16 +49,31 @@ async def on_ready():
 
 @bot.slash_command(
     name = "addtodb",
-    description = "adduid",
+    description = "Enter API Key, Game name, and Tagline (no hashtag)",
     guild_ids= GUILD_ID
 )
-async def test(ctx: nextcord.Interaction, uid: str) -> None:
+async def addtodb(ctx: nextcord.Interaction, api: str, gamename: str, tagline: str) -> None:
     author = str(ctx.user) # We get the username (RobertK#6151)
+    toPrint = ""
     if not db.exists(author+"apikey"): # If username is not already in the database
-        db.set(author + "apikey", uid)
-        await ctx.response.send_message(f'API key "{uid}" associated with "{ctx.user}" is now registered', ephemeral = True) # Make profile for username in database or it will error
+        db.set(author + "apikey", api)
+        toPrint +=(f'API key "{api}" associated with "{ctx.user}" is now registered\n') # Make profile for username in database or it will error
     else: 
-        await ctx.response.send_message(f'"{uid}" already registered with user "{ctx.user}"', ephemeral = True)
+        toPrint +=(f'"{api}" already registered with user "{ctx.user}"\n')
+
+
+    if not db.exists(author+"gamename"): # If username is not already in the database
+        db.set(author + "gamename", gamename)
+        toPrint +=(f'Game name "{gamename}" associated with "{ctx.user}" is now registered\n') # Make profile for username in database or it will error
+    else: 
+        toPrint+=(f'"{gamename}" already registered with user "{ctx.user}"\n')
+        
+    if not db.exists(author+"tagline"): # If username is not already in the database
+        db.set(author + "tagline", tagline)
+        toPrint+=(f'Tagline "{tagline}" associated with "{ctx.user}" is now registered\n') # Make profile for username in database or it will error
+    else: 
+        toPrint+=(f'"{tagline}" already registered with user "{ctx.user}"\n')
+    await ctx.response.send_message(f'{toPrint}', ephemeral = True)
 
 # ==============Isithas shit code begins
 
@@ -66,7 +82,7 @@ async def test(ctx: nextcord.Interaction, uid: str) -> None:
     description = "Display Currency",
     guild_ids= GUILD_ID
 )
-async def test(ctx: nextcord.Interaction) -> None:
+async def dispcurrency(ctx: nextcord.Interaction) -> None:
     author = str(ctx.user) # We get the username (RobertK#6151)
     if not db.exists(author+"currency"): # If username is not already in the database
         await ctx.response.send_message(f'Unable to get currency associated with "{ctx.user}"', ephemeral = True) # Make profile for username in database or it will error
@@ -74,6 +90,22 @@ async def test(ctx: nextcord.Interaction) -> None:
         curr = db.get(author + "currency")
         await ctx.response.send_message(f'"{ctx.user}" has ${curr} in the bank', ephemeral = True)
     
+
+@bot.slash_command(
+    name = "addcurrency",
+    description = "Adds Currency if admin",
+    guild_ids= GUILD_ID
+)
+@application_checks.has_permissions(manage_messages=True)
+async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
+    author = str(usr) # We get the username (RobertK#6151)
+    if not db.exists(author+"currency"): # If username is not already in the database
+        db.set(author+"currency", add)
+        await ctx.response.send_message(f'No currency count associated "{usr}", adding an entry of ${add}', ephemeral = True) # Make profile for username in database or it will error
+    else: 
+        db.set(author+"currency", db.get(author+"currency")+add)
+        curr = db.get(author + "currency")
+        await ctx.response.send_message(f'"{usr}" now has ${curr} in the bank', ephemeral = True)
 # ==============Isitha's shit code ends    
 
 class buttonMenu(nextcord.ui.View):
@@ -105,36 +137,64 @@ print("cheese!")
     description="Enter an opponent's discord username to send them a duel invitation",
 )
 async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> None:
-    await interaction.response.send_message("Awaiting Opponent Response")
-    #gets player 1
-    user = await bot.fetch_user(interaction.user.id)
-    #gets player 2
-    print(user)
-    user2 = await bot.fetch_user(opponent.id)
-    print(user2)
-    
-    view = buttonMenu()
-
-    await user2.send("accept or deny the duel lol", view=view)
-    await view.wait()
-
-    if view.value is None:
-        return
-    elif view.value:
-        #do this
-        print('YAH')
-        embed = nextcord.Embed(color= 0xB9F5F1, title='LETSS GO')
-        embed.add_field(name='iewruhfweiuhf',value= 'ewiufhewifhu',inline=False)
-        
-        await interaction.edit_original_message(content=None, embed=embed)
-    #awidjaijdiawjd
-    
-
+    if inprogress == 1:
+        await interaction.response.send_message("Match already in progress. Please wait for it to end.")
     else:
-        #do that
-        print('NOH')
+        await interaction.response.send_message("Awaiting Opponent Response")
+        #gets player 1
+        user = await bot.fetch_user(interaction.user.id)
+        #gets player 2
+        db.set("Player 1",user)
+        print(user)
+        user2 = await bot.fetch_user(opponent.id)
+        db.set("Player 2", user2)
+        print(user2)
         
-    
+        view = buttonMenu()
+
+        await user2.send("accept or deny the duel lol", view=view)
+        await view.wait()
+
+        if view.value is None:
+            return
+        elif view.value:
+            #do this
+            inprogress = 1
+            print('YAH')
+            embed = nextcord.Embed(color= 0xB9F5F1, title='DUEL: ' +user.name+' VS '+user2.name)
+            embed.add_field(name=(f"{user.name}\'s KDA").ljust(50),value= (f"{user.name}\'s kda data here").ljust(50), inline=True)
+            embed.add_field(name=(f"{user2.name}\'s KDA").rjust(50),value= (f"{user2.name}\'s kda data here").rjust(50),inline=True)
+
+            print(str(user))
+            print(db.get(str(user) + "apikey"))
+            P1 = Player(db.get(str(user) + "apikey").strip(),db.get(str(user)+"gamename").strip(), db.get(str(user)+"tagline").strip())
+            
+            await interaction.edit_original_message(content=None, embed=embed)
+        #i changed a comment
+
+
+    def check_match_length(matchList):
+            prevMatchCount = len(matchList)
+
+            for _ in range(3):  # Loop 3 times 
+                start_time = time.time()
+                time.sleep(3)  # Sleep for 1800 seconds (30 minutes)
+                end_time = time.time()
+
+                if len(matchList) == prevMatchCount + 1:
+                    return 1
+                else:
+                    prevMatchCount = len(matchList)  # Update the previous match count
+
+            print("Match Invalid: Length Too Long")
+
+            return 0  # Assuming a return value of 0 to indicate invalid match
+
+        
+    P1 = Player(db.get(str(user) + "apikey")    ,"choopedpotat", "Bruhy")
+    mlist = P1.get_matchlist()
+    if check_match_length(mlist) == 0:
+        await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
 
 
 
