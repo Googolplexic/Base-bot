@@ -4,6 +4,7 @@
 import os
 from dotenv import load_dotenv
 import discord
+import requests
 
 from discord import Intents
 from discord.ext import commands
@@ -18,7 +19,7 @@ client.tree = tree
 load_dotenv()
 
 prefix = "!"
-def get_summoner_data(summoner_name):
+'''def get_summoner_data(summoner_name):
     url = RIOT_API_URL.replace('REGION', 'YOUR_REGION') + summoner_name
     headers = {
         'X-Riot-Token': RIOT_API_KEY
@@ -28,7 +29,7 @@ def get_summoner_data(summoner_name):
         return response.json()
     else:
         return None
-
+'''
 
 @client.event
 async def on_ready():
@@ -57,37 +58,28 @@ async def first_command(interaction):
 )
 async def not_first_command(interaction):
     await interaction.response.send_message("cheese!")
-
-# @tree.command(
-#     name = "getSummoner"
-#     description="get summoner data"
-#     guild=discord.Object(id=1241468028378677308)
-#     )
-# async def summoner(ctx, *, summoner_name):
-#     data = get_summoner_data(summoner_name)
-#     if data:
-#         await ctx.send(f"Summoner Name: {data['name']}\nSummoner Level: {data['summonerLevel']}")
-#     else:
-#         await ctx.send("Summoner not found or API error.")
-
+    
 @tree.command(
     name = "echo",
     description = "asdw",
     guild=discord.Object(id=1241468028378677308)
-)
+    )
 async def echo(interaction: discord.Interaction, message: str) -> None:
     await interaction.response.send_message(message)
+
+
+
+
 
 @tree.command(
     name="input-userid-api-id",
     description="direct messages the user and grabs a valid input",
     guild=discord.Object(id=1241468028378677308)
 )
-async def user_input_id_api_key(interaction):
-    await interaction.response.send_message("{} is your id".format(interaction.message.author.id))
-
-    user = await client.get_user_info("User's ID here")
-    await interaction.response.send_message(user, "Your message goes here")
+async def on_message(interaction):
+    user = await client.fetch_user(interaction.user.id)
+    await user.send("Hello there!")
+    await interaction.response.send_message("sent!")
 
 
 
