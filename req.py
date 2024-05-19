@@ -12,7 +12,6 @@ class Player():
 
     def get_puuid(self) -> str:
         riot_watcher = RiotWatcher(self.API_KEY)
-        print("aaaaa    ", riot_watcher)
         
         my_account = riot_watcher.account.by_riot_id(self.region, self.game_name, self.tag_line)
         #my_account = riot_watcher.account.by_riot_id('AMERICAS', 'choopedpotat', 'Bruhy')
@@ -23,17 +22,15 @@ class Player():
 
     def get_matchlist(self) -> list:
         riot_watcher = RiotWatcher(self.API_KEY)
-        print("aaaaa    ", riot_watcher)
         
         asd = riot_watcher.account.by_puuid(self.region, self.puuid)
-        print("asd       ",asd)
         lol_watcher = LolWatcher(self.API_KEY, puuid=self.puuid, count=20)
         matchList = lol_watcher.match.matchlist_by_puuid(self.region, puuid=self.puuid)
 
         return matchList
     
     def get_most_recent_match(self) -> dict:
-        return self.get_matchlist()[0]
+        return self.match_data(self.get_matchlist()[0])
 
     def match_data(self, matchID) -> dict:
         lol_watcher = LolWatcher(self.API_KEY, puuid=self.puuid, count=20)
@@ -72,18 +69,47 @@ def testing():
     # print("start")
     william = Player(API_KEY, "choopedpotat", "Bruhy")
     # print("done")
-    print(william.get_puuid())
+    # print(william.get_puuid())
     
 
     mlist = william.get_matchlist()
 
-    print(mlist)
-    for i in range(6):
-        game = william.match_data(mlist[i])
-        print(type(game))
+    game = william.match_data(mlist[0])
+    print(game)
+    #print(mlist)
+    # for i in range(6):
+    #     print(type(game))
 
-        print(william.won_game(game))
+    #     print(william.won_game(game))
+
+
+
+def game_data_collect():
+    API_KEY = "RGAPI-b6af20cb-4e3a-4afa-acb2-571f3a71ac03"
+    william = Player(API_KEY, "choopedpotat", "Bruhy")
+    howard = Player("RGAPI-7102b893-0f9e-4102-8dbb-991d8fabbc5a", "wurrd", "0000")
+    print("=================== William ========================= \n\n")
+    print(william.get_matchlist())
+    WmostRecent = william.get_most_recent_match()
+    print(str(WmostRecent["metadata"]).replace(",",",\n"))
+    print("created:", WmostRecent["info"]["gameCreation"])
+    print("end time stamp: ", WmostRecent["info"]["gameEndTimestamp"])
+    print("gameId: ", WmostRecent["info"]["gameId"])
+    print("gameMode: ", WmostRecent["info"]["gameMode"])
+    print("won game: ", william.won_game(WmostRecent))
+
+
+    print("=================== Howard ========================= \n\n")
+    print(howard.get_matchlist())
+    HmostRecent = howard.get_most_recent_match()
+    print(str(HmostRecent["metadata"]).replace(",",",\n"))
+    print("created:", HmostRecent["info"]["gameCreation"])
+    print("end time stamp: ", HmostRecent["info"]["gameEndTimestamp"])
+    print("gameId: ", HmostRecent["info"]["gameId"])
+    print("gameMode: ", HmostRecent["info"]["gameMode"])
+    print("won game: ", howard.won_game(HmostRecent))
 
 
 if (__name__ == "__main__"):
-    testing()
+    # testing()
+    game_data_collect()
