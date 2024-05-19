@@ -210,9 +210,10 @@ async def my_command(ctx):
 @my_command.error
 async def my_command_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
-        await ctx.send(f"You already claimed your allowance recently. Please try again in {int(error.retry_after)} seconds.")
+        await ctx.send(f"This command is on cooldown. Please try again in {int(error.retry_after)} seconds.")
     else:
         raise error
+
     
 
 @bot.event
