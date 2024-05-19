@@ -109,6 +109,9 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         embed.add_field(name='iewruhfweiuhf',value= 'ewiufhewifhu',inline=False)
         
         await interaction.edit_original_message(content=None, embed=embed)
+    #awidjaijdiawjd
+    
+
     else:
         #do that
         print('NOH')
