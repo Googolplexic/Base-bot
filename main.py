@@ -83,6 +83,7 @@ async def summoner(ctx, *, summoner_name):
 async def on_message(interaction):
     user = await client.fetch_user(interaction.user.id)
     await user.send("Hello there!")
+    await interaction.response.send_message("sent!")
 
 
 
