@@ -224,6 +224,9 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
     if check_match_length(mlist) == 0:
         await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
 
+    #when the duel is won by one party or the other
+    
+
 
 
 @bot.slash_command(
