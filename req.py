@@ -10,7 +10,7 @@ class Player():
         self.puuid = self.get_puuid()
 
 
-    def get_puuid(self):
+    def get_puuid(self) -> str:
         riot_watcher = RiotWatcher(self.API_KEY)
         print("aaaaa    ", riot_watcher)
         
@@ -21,7 +21,7 @@ class Player():
         return (my_account['puuid'])
 
 
-    def get_matchlist(self):
+    def get_matchlist(self) -> list:
         riot_watcher = RiotWatcher(self.API_KEY)
         print("aaaaa    ", riot_watcher)
         
@@ -31,10 +31,11 @@ class Player():
         matchList = lol_watcher.match.matchlist_by_puuid(self.region, puuid=self.puuid)
 
         return matchList
-    def get_most_recent_match(self):
+    
+    def get_most_recent_match(self) -> dict:
         return self.get_matchlist()[0]
 
-    def match_data(self, matchID):
+    def match_data(self, matchID) -> dict:
         lol_watcher = LolWatcher(self.API_KEY, puuid=self.puuid, count=20)
         matchData = lol_watcher.match.by_id(self.region, matchID);
         return matchData
@@ -49,10 +50,10 @@ class Player():
             return True
         else:
             return False
-    def won_game(self, game):
+    def won_game(self, game) -> bool:
         for i in range(10):
             if (game['info']['participants'][i]['puuid'] == self.puuid):
-                return game['info']['participants'][i]['win']
+                return type(game['info']['participants'][i]['win'])
 
 
 def in_same_game(player1:Player, player2:Player) -> bool:
@@ -76,12 +77,12 @@ def testing():
 
     mlist = william.get_matchlist()
 
-    # print(mlist)
-    # for i in range(6):
-    #     game = william.match_data(mlist[i])
-    #     # print(game)
+    print(mlist)
+    for i in range(6):
+        game = william.match_data(mlist[i])
+        print(type(game))
 
-    #     print(william.won_game(game))
+        print(william.won_game(game))
 
 
 if (__name__ == "__main__"):
