@@ -49,30 +49,24 @@ class Player():
                 return game['info']['participants'][i]['win']
 
             
-
-    
-
-# print("start")
-william = Player(API_KEY, "choopedpotat", "Bruhy")
-# print("done")
-print(william.get_puuid())
+##=======================Testing of Functions===================
 
 
-mlist = william.get_matchlist()
-print(mlist)
-for i in range(6):
-    game = william.match_data(mlist[i])
-    # print(game)
+def testing():
+    # print("start")
+    william = Player(API_KEY, "choopedpotat", "Bruhy")
+    # print("done")
+    print(william.get_puuid())
 
-    print(william.won_game(game))
 
-# print()
+    mlist = william.get_matchlist()
+    print(mlist)
+    for i in range(6):
+        game = william.match_data(mlist[i])
+        # print(game)
 
-# puuid = get_puuid(API_KEY)
-# print(puuid)
+        print(william.won_game(game))
 
-# ee = get_match(API_KEY, puuid)
-# print(ee)
 
-# Match = match_info(API_KEY, ee[2])
-# print(Match['metadata']['participants'])
+if (__name__ == "__main__"):
+    testing()
