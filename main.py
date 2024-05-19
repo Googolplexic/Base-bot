@@ -16,7 +16,7 @@ from nextcord import Intents
 from nextcord import Client
 from nextcord.ext import application_checks
 import pickledb
-from req import Player
+from req import Player, in_same_game
 tracemalloc.start()
 db = pickledb.load('discord.db', True)
 db.set("Player 1", "")
@@ -226,14 +226,17 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
                     print("Match Invalid: Length Too Long")
                     return 0  # Assuming a return value of 0 to indicate invalid match
 
-        
-    P1 = Player(db.get(str(user) + "apikey")   ,"choopedpotat", "Bruhy")
+    # =================Isitha was involved here proceed with caution ================    
+    P1 = Player(db.get(str(user) + "apikey") , db.get(str(user) + "gamename"), db.get(str(user) + "tagline"))
     mlist = P1.get_matchlist()
     await check_match_length(mlist)
     await interaction.edit_original_message(content='the match went on for so long that the bot decided to sleep')
-
+    match = P1.get_most_recent_match()
     #add function for checking who won
-    winner = user
+    if P1.won_game(match):
+        # distribute winnings
+    
+    # ================================================================================
 
     #when the duel is won by one party or the other
     if inprogress == 1 and duel_over == True:
