@@ -134,12 +134,12 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
     #awidjaijdiawjd 
 
 
-    async def check_match_length(matchList):
+    def check_match_length(matchList):
         prevMatchCount = len(matchList)
 
         for _ in range(3):  # Loop 3 times 
             start_time = time.time()
-            await asyncio.sleep(5)  # Non-blocking sleep for 5 seconds
+            time.sleep(5)  # Sleep for 1800 seconds (30 minutes)
             end_time = time.time()
 
             if len(matchList) == prevMatchCount + 1:
@@ -150,11 +150,10 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
         print("Match Invalid: Length Too Long")
         return 0  # Assuming a return value of 0 to indicate invalid match
 
-    async def main():
-        P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
-        mlist = await P1.get_matchlist()
-        result = await check_match_length(mlist)
-        print(result)
+        
+    P1 = Player(str(user) + "apikey","choopedpotat", "Bruhy")
+    mlist = P1.get_matchlist
+    check_match_length(mlist)
 
 
 
@@ -189,7 +188,32 @@ async def on_message(interaction):
     await interaction.response.send_message("sent!")
 
 
+@bot.slash_command(
+        name = "claim",
+        description = "Claim your daily betting allowance",
+    guild_ids = GUILD_ID
+)
+async def test(ctx: nextcord.Interaction) -> None:
+    author = str(ctx.user) # We get the username (RobertK#6151)
+    if not db.exists(author+"currency"): # If username is not already in the database
+        await ctx.response.send_message(f'Unable to get currency associated with "{ctx.user}"', ephemeral = True) # Make profile for username in database or it will error
+    else:
+        curr = db.get(author + "currency")
+        curr+= 1000
+        await ctx.response.send_message(f'"{ctx.user}" now has ${curr} in the bank', ephemeral = True)
 
+@commands.cooldown(1, 300, commands.BucketType.user)      
+async def my_command(ctx):
+    await ctx.send("Claimed!")
+
+# CD
+@my_command.error
+async def my_command_error(ctx, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        await ctx.send(f"You already claimed your allowance recently. Please try again in {int(error.retry_after)} seconds.")
+    else:
+        raise error
+    
 
 @bot.event
 async def on_message(message):
