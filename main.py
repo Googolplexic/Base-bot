@@ -105,7 +105,7 @@ async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
     author = str(usr) 
     if not db.exists(author+"currency"): 
         await ctx.response.send_message(f'No currency count associated "{usr}", adding an entry of ${add}', ephemeral = True) 
-        db.set(author+"currency", db.get(author+"currency"))
+        db.set(author+"currency", add)
     else: 
         db.set(author+"currency", db.get(author+"currency")+add)
         curr = db.get(author + "currency")
@@ -230,10 +230,10 @@ async def chooseWinner(interaction: nextcord.Interaction, winner: nextcord.User)
                 tempu = await bot.fetch_user(i)
                 if db.get(str(tempu)+"betusr") == str(winner): 
                     db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"betamt")) + int(db.get(str(tempu)+"currency"))))
-                    await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                    await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now ${db.get(str(tempu)+'currency')}")
                 else:
                     db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"currency")) - int(db.get(str(tempu)+"betamt"))))
-                    await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                    await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now ${db.get(str(tempu)+'currency')}")
             better_list= []
             inprogress = 0
         else:
@@ -321,17 +321,17 @@ async def singles(interaction: nextcord.Interaction) -> None:
                 if P1.won_game(match):
                     if db.get(str(tempu)+"betusr")[1] == "W":
                         db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+'betamt')) + int(db.get(str(tempu)+'currency'))))
-                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now ${db.get(str(tempu)+'currency')}")
                     else:
                         db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"currency")) - int(db.get(str(tempu)+"betamt"))))
-                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now ${db.get(str(tempu)+'currency')}")
                 else:
                     if db.get(str(tempu)+"betusr")[1] == "L":
                         db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+'betamt')) + int(db.get(str(tempu)+'currency'))))
-                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} has hit! Your balance is now ${db.get(str(tempu)+'currency')}")
                     else:
                         db.set(str(tempu)+"currency",str(int(db.get(str(tempu)+"currency")) - int(db.get(str(tempu)+"betamt"))))
-                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now {db.get(str(tempu)+'currency')}")
+                        await tempu.send(f"Your bet of ${db.get(str(tempu)+'betamt')} did not hit! Your balance is now ${db.get(str(tempu)+'currency')}")
             better_list= []
             inprogress = 0
         
