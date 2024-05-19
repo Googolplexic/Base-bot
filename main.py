@@ -99,35 +99,27 @@ async def duel(interaction: nextcord.Interaction, opponent: nextcord.User) -> No
     
     view = buttonMenu()
 
-    await user2.send("accept or deny lol L", view=view)
+    await user2.send("accept or deny the duel lol", view=view)
     await view.wait()
 
     if view.value is None:
         return
     elif view.value:
         #do this
-        print('NOH')
+        print('YAH')
+        embed = nextcord.Embed(color= 0xB9F5F1, title='LETSS GO')
+        embed.add_field(name='iewruhfweiuhf',value= 'ewiufhewifhu',inline=False)
+        
+        await interaction.edit_original_message(content=None, embed=embed)
+    #awidjaijdiawjd
+    
+
     else:
         #do that
-        print('YAH')
+        print('NOH')
+        
     
-    # await user.send("Hello there!")
-    # await interaction.response.send_message("sent!")
-    # await interaction.response.send_message("p1" + user.name)
-    # await interaction.response.send_message("p2" + user2.name)
 
-
-
-# @client.command()
-# async def info(ctx, user:discord.User):
-#     return await ctx.send(user.name)
-def get_user_id(server: nextcord.Guild, username: str) -> int:
-# Loop through all the members on the server
-    for member in server.members:
-        # Check if the member's username matches the specified username
-        if member.name == username:
-            return member.id
-    raise nextcord.errors.NotFound(f"User '{username}' not found on the server.")
 
 
 @bot.slash_command(
