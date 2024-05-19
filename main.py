@@ -113,7 +113,7 @@ async def addcurrency(ctx: nextcord.Interaction, usr: nextcord.User,add: int):
 
 @bot.slash_command(
     name = "bet",
-    description = "bet-to-win is for singles mode only, useless otherwise",
+    description = "Double or nothing, bet-to-win is for singles mode only, useless otherwise",
     guild_ids= GUILD_ID
 )
 async def bet(ctx: nextcord.Interaction, usr: nextcord.User, amt: int, bet_to_win: bool):
