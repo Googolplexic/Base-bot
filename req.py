@@ -34,19 +34,31 @@ class Player():
         lol_watcher = LolWatcher(self.API_KEY, puuid=self.puuid, count=20)
         matchData = lol_watcher.match.by_id(self.region, matchID);
         return matchData
+    
+    def in_game_with(self, user, matchID):
+        playerCounter = 0
+        for i in range(10):
+            id = game['info']['participants'][i]['puuid']
+            if (id==user.puuid) or (id==self.puuid):
+                playerCounter += 1
+        if playerCounter == 2:
+            return True
+        else:
+            return False
 
 
-print("start")
+# print("start")
 william = Player(API_KEY, "choopedpotat", "Bruhy")
-print("done")
+# print("done")
 print(william.get_puuid())
+
 
 mlist = william.get_matchlist()
 print(mlist)
 game = william.match_data(mlist[1])
 print(game)
 for i in range(10):
-    print(game['info']['participants'][i]['win'])
+    print(game['info']['participants'][i]['puuid'])
 
 # print()
 
